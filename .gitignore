@@ -1,0 +1,10 @@
+.*
+!.gitignore
+!.gitmodules
+Thumbs.db
+db.json
+*.log
+package-lock.json
+yarn.lock
+node_modules/
+public/

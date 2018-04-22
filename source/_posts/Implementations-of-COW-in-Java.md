@@ -43,13 +43,13 @@ Java 类库中提供了两个 Copy-on-Write 的类: `CopyOnWriteArrayList` 和 `
 
 `CopyOnWriteArrayList` 只有在对其进行修改操作时才会进行同步操作, 因此其 `add`, `remove` 等方法中均使用了同步机制; 在 `CopyOnWriteArrayList` 中, 定义了一个可重入锁:
 
-```java CopyOnWriteArrayList.java
+```java CopyOnWriteArrayList.java http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/concurrent/CopyOnWriteArrayList.java
 final transient ReentrantLock lock = new ReentrantLock();
 ```
 
 该锁用于对所有修改集合的方法 (`add`, `remove` 等) 进行同步, 在进行实际修改操作时, 会先复制原来的数组, 再进行修改, 最后替换原来的:
 
-```java CopyOnWriteArrayList.java
+```java CopyOnWriteArrayList.java http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/concurrent/CopyOnWriteArrayList.java
 public boolean add(E e) {
 	final ReentrantLock lock = this.lock;
 	lock.lock();
@@ -68,7 +68,7 @@ public boolean add(E e) {
 
 由于在修改时复制了一份数据, 因此所有读取操作都无需进行同步:
 
-```java CopyOnWriteArrayList.java
+```java CopyOnWriteArrayList.java http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/concurrent/CopyOnWriteArrayList.java
 public E get(int index) {
 	return get(getArray(), index);
 }
@@ -82,7 +82,7 @@ public E get(int index) {
 
 `CopyOnWriteArraySet` 的实现是基于 `CopyOnWriteArrayList` 的, 其内部维护了一个 `CopyOnWriteArrayList` 实例 `al`:
 
-```java CopyOnWriteArraySet.java
+```java CopyOnWriteArraySet.java http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/concurrent/CopyOnWriteArraySet.java
 private final CopyOnWriteArrayList<E> al;
 
 public CopyOnWriteArraySet() {
@@ -92,7 +92,7 @@ public CopyOnWriteArraySet() {
 
 所有对 `CopyOnWriteArraySet` 的操作都被委托给 `al`, 如 `add` 方法:
 
-```java CopyOnWriteArraySet.java
+```java CopyOnWriteArraySet.java http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/concurrent/CopyOnWriteArraySet.java
 public boolean add(E e) {
 	return al.addIfAbsent(e);
 }

@@ -302,7 +302,7 @@ mysql> select * from master_table;
 
 ## Using Docker
 
-可以在 [GitHub](https://github.com/kezhenxu94/mysql-master-slaves) 上获取到 docker-compose 文件, 使用以下命令启动 docker 容器, 待容器运行稳定之后, 就可以得到一个主服务器和两个从服务器;
+可以在 [GitHub](https://github.com/kezhenxu94/blog-code/tree/master/mysql-master-slaves) 上获取到 docker-compose 文件, 使用以下命令启动 docker 容器, 待容器运行稳定之后, 就可以得到一个主服务器和两个从服务器;
 
 ```shell
 $ docker-compose up

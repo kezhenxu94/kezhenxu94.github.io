@@ -2,6 +2,11 @@
 	{
 		"name": "vim-mysql-plugin",
 		"url": "https://github.com/kezhenxu94/vim-mysql-plugin",
-		"desc": "A highly customizable MySQL VIM plugin"
+		"desc": "一个简洁的 VIM MySQL 客户端插件, 在使用 VIM 编写 SQL 脚本的同时还可以运行 SQL 脚本文件中的语句或整个脚本文件."
+	},
+	{
+		"name": "house-renting",
+		"url": "https://github.com/kezhenxu94/house-renting",
+		"desc": "租房信息聚合分析, 目前聚合了 [58 同城](http://www.58.com), [豆瓣](https://www.douban.com), [链家](https://lianjia.com) 的上百个城市地区, 可选择只扒取你感兴趣的城市, 也可以利用扒取的数据做数据分析."
 	}
 ]

@@ -1,5 +1,5 @@
 ---
-title: EnumSet - A Special Set
+title: EnumSet - 特殊的 Set
 tags:
   - Java
   - Java Collection

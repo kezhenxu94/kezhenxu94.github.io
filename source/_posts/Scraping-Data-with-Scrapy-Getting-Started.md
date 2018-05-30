@@ -1,5 +1,5 @@
 ---
-title: Scraping Data with Scrapy - Getting Started
+title: 使用 Scrapy 扒取数据 - 入门
 tags:
   - Scrapy
   - Python

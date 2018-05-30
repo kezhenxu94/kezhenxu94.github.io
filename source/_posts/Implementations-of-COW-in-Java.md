@@ -1,5 +1,5 @@
 ---
-title: Implementations of COW in Java
+title: Java 中的写时复制 (Copy on Write, COW)
 tags:
   - Java
   - Concurrent
@@ -12,7 +12,7 @@ updated: 2018-04-22 15:47:20
 
 ## Background
 
-写时拷贝 (Copy on Write, COW) 有时也叫 "隐式共享", 顾名思义, 就是让所有需要使用资源 R 的使用者共享资源 R 的同一个副本, 当其中的某一个使用者要对资源 R 进行修改操作时, 先复制 R 的一个副本 R' , 再进行修改操作;
+写时复制 (Copy on Write, COW) 有时也叫 "隐式共享", 顾名思义, 就是让所有需要使用资源 R 的使用者共享资源 R 的同一个副本, 当其中的某一个使用者要对资源 R 进行修改操作时, 先复制 R 的一个副本 R' , 再进行修改操作;
 
 ## Problem
 

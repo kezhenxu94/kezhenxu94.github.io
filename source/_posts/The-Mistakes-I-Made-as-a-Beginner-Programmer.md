@@ -1,5 +1,5 @@
 ---
-title: (Translation) The Mistakes I Made as a Beginner Programmer
+title: '[译] 我在编程初级阶段常犯的错误'
 tags:
   - Translation
   - Others
@@ -11,8 +11,6 @@ updated: 2018-04-29 18:27:30
 > * 原文地址：[The Mistakes I Made As a Beginner Programmer](https://medium.com/@samerbuna/the-mistakes-i-made-as-a-beginner-programmer-ac8b3e54c312)
 > * 原文作者：[Samer Buna](https://medium.com/@samerbuna?source=post_header_lockup)
 > * 译者：[kezhenxu94](https://github.com/kezhenxu94)
-
-# 我在编程初级阶段常犯的错误
 
 ## 学会辨识错误，养成习惯去避免它们
 

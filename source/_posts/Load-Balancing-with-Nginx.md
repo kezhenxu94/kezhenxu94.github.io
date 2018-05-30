@@ -1,5 +1,5 @@
 ---
-title: Load Balancing with Nginx
+title: 使用 Nginx 进行负载均衡
 tags:
   - Load Balancing
   - Nginx

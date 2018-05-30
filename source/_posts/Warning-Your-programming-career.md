@@ -1,5 +1,5 @@
 ---
-title: '[译]关于你的编程生涯的一些告诫'
+title: '[译] 关于你的编程生涯的一些告诫'
 tags:
   - Translation
   - Others

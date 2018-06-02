@@ -1,12 +1,12 @@
 ---
-title: Testing RESTful API with curl and jq - jq basis
+title: 使用 `curl` 和 `jq` 测试 RESTful API - `jq` 基础
 date: 2018-03-18 10:34:15
 tags: [CLI, Productivity]
 ---
 
 {% include_code "A json file for testing" lang:json Testing-RESTful-API-with-curl-and-jq-jq-basis/test.json %}
 
-## `jq` basic usages
+## `jq` 基础用法
 
 > 在 [这里](https://stedolan.github.io/jq/manual/) 查看 `jq` 的完整手册
 

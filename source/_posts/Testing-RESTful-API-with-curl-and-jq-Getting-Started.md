@@ -1,5 +1,5 @@
 ---
-title: Testing RESTful API with curl and jq - Getting Started
+title: 使用 `curl` 和 `jq` 测试 RESTful API - 入门
 date: 2018-03-17 20:45:21
 updated: 2018-03-28 20:30:11
 tags: [Testing, CLI, Productivity]

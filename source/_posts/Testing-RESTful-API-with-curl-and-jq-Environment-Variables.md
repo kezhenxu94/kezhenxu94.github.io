@@ -1,5 +1,5 @@
 ---
-title: Testing RESTful API with curl and jq - Environment Variables
+title: 使用 `curl` 和 `jq` 测试 RESTful API - 环境变量
 date: 2018-03-28 20:26:10
 updated: 2018-03-28 20:26:10
 tags: [Testing, CLI, Productivity]

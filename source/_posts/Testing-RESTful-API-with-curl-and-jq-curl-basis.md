@@ -1,5 +1,5 @@
 ---
-title: Testing RESTful API with curl and jq - curl basis
+title: 使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础
 date: 2018-03-17 23:22:13
 tags: 
   - CLI
@@ -8,7 +8,7 @@ tags:
 
 > 本文使用的所有示例接口都来自 [github 的公开接口](https://developer.github.com/v3/), 对此表示感谢
 
-## `curl` basic usages
+## `curl` 基本用法
 
 > 使用 `man curl` 查看 `curl` 命令的完整手册
 

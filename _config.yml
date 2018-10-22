@@ -89,4 +89,4 @@ feed:
 deploy:
   type: git
   repo: git@github.com:kezhenxu94/kezhenxu94.github.io.git
-  branch: gh-pages
+  branch: master

@@ -1,10 +1,10 @@
 language: node_js
 node_js: stable
 before_install:
-  - npm i hexo-cli -g
+- npm i hexo-cli -g
 script:
-  - hexo clean
-  - hexo generate
+- hexo clean
+- hexo generate
 deploy:
   provider: pages
   github-token: "$GITHUB_TOKEN"
@@ -16,7 +16,7 @@ deploy:
     branch: src
 cache:
   directories:
-    - node_modules
+  - node_modules
 env:
   global:
-    secure: Cvs2wD9pO2BIURY8Vrq7uiaAOQ31BHEm1iUx1Z0X5v0SLpkdlPjWFP2ACau3W2Fpx0GaTEO/56wvPvVdwWgfJrVl+TZM3AB/JieTuo5IqBskoEU/mzYExFLbHZGWC8ko4lb8EXs02NMBVEQV2sZS5V2Hjqs8BcGoYW62vmB/O+/DQ6vRKldz9o4f49eNz3z9NhhTsa2BBlgnThzAdcjP6hAFCPlBQOe58SnVJ/7xrBJjSIn4VSAqQqpmwzVg/xKif0siMP+BP1YV5gTz6sQNLnHMCm1TJvYOM5KrJaES5YRdYfyF7t02qBCUpnCGPK3NfZyC34ERuIx8yFgQi3DHcwzWLY1lGXlNhXFjyJesICHaCGzEEadJP4nZMh7s8duYuJ4F6Li9lvm3rhWWzUtjrZ8CoO2z6Adm5kYtHttpet+pOmxAjx9uyqr4Dt3EmAj76T8tpOOgTjIdgfDGnaxgwEK0euEfCbwPTE9vLaIsIJ/FQ+CcF08Iu0o3O07ZsYOP+7IBu6Cxmyz1+iTEcXR2bCRr/fPQxVO/TswJ4yEXP/K37lRNviZXuLwcfXOm1SjPtDx56ku/cAUxcejyZ8NZKfm5ixHLwZB0veWMCUT+6wlCYszwGsR97ltxJMzfbbY2Db6GrKqpQmqTv33bUk9d3+owLsLOSaz0LMY9IlggWSI=
+    secure: hCB87BU/bDqQTe28EDSj/oncbTHoJt6VHXmWR84pdVNXZkENS9XZsbBtWlV1PtOpxSHnpf3hSty8kn+RsqF6EY9z7yg3p4dFAd5iSc4qZyuHXgKmhFak+1yVjjba3THpsnmOIms24G7WYXshABluXgLPYeGwOQ17pVVI/DWRTk9rR+KMotGO8PznjnqF+0F/ZwfvYiw7dEhIV4Od6WeQzM4eTw0gW8NQiGrxVDX2wkY2pkAl2dcGdw5ddURrRzzT37XJgKF+szkIulNmUble29iLpsKFCEjhiVF3OCbG5AMGYPJLHWRnh2CHQ7skcqQYGFjYfQBfhwwosSqpmviCu5lpobe3hW1Y9TzS3fLRLOMxTTefhVz5jWhYRTAyJIrtoxL9+SbaxuUMbVIt/4XTgMPHDfc7ba3gE84cc0zfFHw0Yd4s5Td5nKuQD3iNEwAciMMnSdfhfPctjKqqENf/2MiiPTEq5IZiBk5ux3xiRpPZBSaXPIXy3Ry+yRGJ9LqgIxGGn8+g+Pv5IHNI1jqtVSoVxVB+si9yp4bjM1SsKKJCbo5pnQBjKFaQOrBP+CYDo/X/yBJxdl5Q58bXh7uTbnl4kwiV5tZ0pjTT6AcAYUX3B5vDrSTmUW0yI4sMuS1QPbIQyzA8otGY0hcrCojepmzifuu0HeIQpmJKsSGk0LU=

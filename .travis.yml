@@ -12,7 +12,7 @@ deploy:
   local_dir: public
   on:
     repo: kezhenxu94/kezhenxu94.github.io
-    branch: master
+    branch: src
 cache:
   directories:
     - node_modules

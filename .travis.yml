@@ -10,6 +10,7 @@ deploy:
   github-token: "$GITHUB_TOKEN"
   skip_cleanup: true
   local_dir: public
+  target-branch: master
   on:
     repo: kezhenxu94/kezhenxu94.github.io
     branch: src

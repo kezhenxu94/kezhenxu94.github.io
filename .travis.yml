@@ -1,0 +1,26 @@
+env:
+  global:
+    secure: sJjY1C2LJqLx4caCsgU4/VWpnVHpVGRuQNQwMvvLFdmAJ+vlAocDmNDF56iQkulb5SM0zknK1s4nwr4yyFQDYg0KqoI2+n0PiFsfqe2OWnsx6Jkr/bbRQm9mWxGvj9vRtOBwnBsyH4/n9GRVcAevSHYkMZTaPOPbcrEuNtVQkGfiY0swl0hg+bQmsfsvGlM0Lf7gkUJk2IkJjtSnQ3VWJPanR4sHqVsdtQD9Jrf03o7aGCYkfPKtfgb45JNlTloFaWM8/N0yDAZ8VSi/31Ruv2wSVSh4/k8uwZMFKqlsjSlnQhX8gOi6JEtzL99zHDyk+PRovk9r43LNrz2GAEACRiT0a+37+FDpZgNdEdN9ABGsaEoJO5kX24rHvD0EmznPBSJd1jxWVVeO2/gAQHPJRJol5OzCMZo/0Y2Y7PMAplqu2CNjKXLPqC4LrCp/GQGg+Gb4qBogK5LiHvsu4Ufj3ndLGRRiwv7R9vU9NlBvrb+dVGuwLTUgtL3083A587EWyPwciI9e+RZa+U/D/hesa+2wszj3D9/Xr0NQR8p8Sa4BXbL/dLspgRMC8Vvak5Re8bJaPyajixQ7bT5Xhkdjz44w8CTAYo6wsfkD4KdUWQFd/6lzGFOcAzUsLbBhMuq5UZ26RFIeZdzWiZMjmyek/pePAfHpoJAQUD0PflTn4rM=
+
+language: node_js
+node_js: "stable"
+
+before_install:
+  - npm i hexo-cli -g
+
+script:
+  - hexo clean
+  - hexo generate
+
+deploy:
+  provider: pages
+  github-token: "$GITHUB_TOKEN"
+  skip_cleanup: true
+  local_dir: public
+  on:
+    repo: kezhenxu94/kezhenxu94.github.io
+    branch: master
+
+cache:
+  directories:
+    - node_modules

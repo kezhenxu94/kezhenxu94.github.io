@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.gitmodules
+!.travis.yml
 Thumbs.db
 db.json
 *.log

@@ -1,9 +1,9 @@
 {
-  "name": "hexo-site",
-  "version": "0.0.0",
+  "name": "kezhenxu94.me",
+  "version": "1.0.0",
   "private": true,
   "hexo": {
-    "version": "3.7.1"
+    "version": "3.8.0"
   },
   "dependencies": {
     "hexo": "^3.8.0",
@@ -21,7 +21,7 @@
     "hexo-renderer-marked": "^0.3.0",
     "hexo-renderer-stylus": "^0.3.1",
     "hexo-server": "^0.2.2",
-    "npm": "^5.8.0",
+    "npm": "^6.4.1",
     "to": "^0.2.9",
     "update": "^0.7.4"
   }

@@ -3,4 +3,4 @@
 	url = https://github.com/kezhenxu94/hexo-theme-cactus
 [submodule "source/downloads/code"]
 	path = source/downloads/code
-	url = git@github.com:kezhenxu94/blog-code.git
+	url = https://github.com/kezhenxu94/blog-code

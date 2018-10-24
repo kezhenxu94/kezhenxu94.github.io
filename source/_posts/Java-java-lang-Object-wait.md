@@ -43,7 +43,7 @@ updated: 2018-04-11 11:31:04
 
 生产者的代码如下:
 
-{% include_code lang:java Java-java-lang-Object-wait/IntegerProducer.java %}
+{% include_code lang:java Java-java-lang-Object-wait/src/me/kezhenxu94/blog/IntegerProducer.java %}
 
 其中需要注意的是:
 

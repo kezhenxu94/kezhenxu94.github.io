@@ -1,10 +1,17 @@
+env:
+  global:
+    secure: hCB87BU/bDqQTe28EDSj/oncbTHoJt6VHXmWR84pdVNXZkENS9XZsbBtWlV1PtOpxSHnpf3hSty8kn+RsqF6EY9z7yg3p4dFAd5iSc4qZyuHXgKmhFak+1yVjjba3THpsnmOIms24G7WYXshABluXgLPYeGwOQ17pVVI/DWRTk9rR+KMotGO8PznjnqF+0F/ZwfvYiw7dEhIV4Od6WeQzM4eTw0gW8NQiGrxVDX2wkY2pkAl2dcGdw5ddURrRzzT37XJgKF+szkIulNmUble29iLpsKFCEjhiVF3OCbG5AMGYPJLHWRnh2CHQ7skcqQYGFjYfQBfhwwosSqpmviCu5lpobe3hW1Y9TzS3fLRLOMxTTefhVz5jWhYRTAyJIrtoxL9+SbaxuUMbVIt/4XTgMPHDfc7ba3gE84cc0zfFHw0Yd4s5Td5nKuQD3iNEwAciMMnSdfhfPctjKqqENf/2MiiPTEq5IZiBk5ux3xiRpPZBSaXPIXy3Ry+yRGJ9LqgIxGGn8+g+Pv5IHNI1jqtVSoVxVB+si9yp4bjM1SsKKJCbo5pnQBjKFaQOrBP+CYDo/X/yBJxdl5Q58bXh7uTbnl4kwiV5tZ0pjTT6AcAYUX3B5vDrSTmUW0yI4sMuS1QPbIQyzA8otGY0hcrCojepmzifuu0HeIQpmJKsSGk0LU=
+
 language: node_js
 node_js: stable
+
 before_install:
-- npm i hexo-cli -g
+  - npm i hexo-cli -g
+
 script:
-- hexo clean
-- hexo generate
+  - hexo clean
+  - hexo generate
+
 deploy:
   provider: pages
   github-token: "$GITHUB_TOKEN"
@@ -14,6 +21,8 @@ deploy:
   on:
     repo: kezhenxu94/kezhenxu94.github.io
     branch: src
-env:
-  global:
-    secure: hCB87BU/bDqQTe28EDSj/oncbTHoJt6VHXmWR84pdVNXZkENS9XZsbBtWlV1PtOpxSHnpf3hSty8kn+RsqF6EY9z7yg3p4dFAd5iSc4qZyuHXgKmhFak+1yVjjba3THpsnmOIms24G7WYXshABluXgLPYeGwOQ17pVVI/DWRTk9rR+KMotGO8PznjnqF+0F/ZwfvYiw7dEhIV4Od6WeQzM4eTw0gW8NQiGrxVDX2wkY2pkAl2dcGdw5ddURrRzzT37XJgKF+szkIulNmUble29iLpsKFCEjhiVF3OCbG5AMGYPJLHWRnh2CHQ7skcqQYGFjYfQBfhwwosSqpmviCu5lpobe3hW1Y9TzS3fLRLOMxTTefhVz5jWhYRTAyJIrtoxL9+SbaxuUMbVIt/4XTgMPHDfc7ba3gE84cc0zfFHw0Yd4s5Td5nKuQD3iNEwAciMMnSdfhfPctjKqqENf/2MiiPTEq5IZiBk5ux3xiRpPZBSaXPIXy3Ry+yRGJ9LqgIxGGn8+g+Pv5IHNI1jqtVSoVxVB+si9yp4bjM1SsKKJCbo5pnQBjKFaQOrBP+CYDo/X/yBJxdl5Q58bXh7uTbnl4kwiV5tZ0pjTT6AcAYUX3B5vDrSTmUW0yI4sMuS1QPbIQyzA8otGY0hcrCojepmzifuu0HeIQpmJKsSGk0LU=
+
+notifications:
+  email:
+    on_success: always
+    on_failure: always

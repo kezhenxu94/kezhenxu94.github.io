@@ -5,6 +5,11 @@
 		"desc": "Possibly the best practice of Scrapy and renting a house (可能是 Scrapy 和租房的最佳实践) [![GitHub stars](https://img.shields.io/github/stars/kezhenxu94/house-renting.svg?style=plastic&label=Stars)](https://github.com/kezhenxu94/house-renting/) [![GitHub stars](https://img.shields.io/github/forks/kezhenxu94/house-renting.svg?style=plastic&label=Forks)](https://github.com/kezhenxu94/house-renting/) [![GitHub stars](https://img.shields.io/github/watchers/kezhenxu94/house-renting.svg?style=plastic&label=Watchers)](https://github.com/kezhenxu94/house-renting/)"
 	},
 	{
+		"name": "mini-github",
+		"url": "https://github.com/kezhenxu94/mini-github",
+		"desc": "GitHub Mini Program(GitHub 微信小程序) [![GitHub stars](https://img.shields.io/github/stars/kezhenxu94/mini-github.svg?style=plastic&label=Stars)](https://github.com/kezhenxu94/mini-github/) [![GitHub stars](https://img.shields.io/github/forks/kezhenxu94/mini-github.svg?style=plastic&label=Forks)](https://github.com/kezhenxu94/mini-github/) [![GitHub stars](https://img.shields.io/github/watchers/kezhenxu94/mini-github.svg?style=plastic&label=Watchers)](https://github.com/kezhenxu94/mini-github/)"
+	},
+	{
 		"name": "Cache-Lite",
 		"url": "https://github.com/kezhenxu94/cache-lite",
 		"desc": "An extremely lite-weight cache framework in Kotlin, demonstrating how cache works [![GitHub stars](https://img.shields.io/github/stars/kezhenxu94/cache-lite.svg?style=plastic&label=Stars)](https://github.com/kezhenxu94/cache-lite/) [![GitHub stars](https://img.shields.io/github/forks/kezhenxu94/cache-lite.svg?style=plastic&label=Forks)](https://github.com/kezhenxu94/cache-lite/) [![GitHub stars](https://img.shields.io/github/watchers/kezhenxu94/cache-lite.svg?style=plastic&label=Watchers)](https://github.com/kezhenxu94/cache-lite/)"

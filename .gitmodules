@@ -1,6 +1,6 @@
 [submodule "themes/cactus"]
 	path = themes/cactus
-	url = https://github.com/kezhenxu94/hexo-theme-cactus
+	url = http://gitee.com/kezhenxu94/hexo-theme-cactus
 [submodule "source/downloads/code"]
 	path = source/downloads/code
-	url = https://github.com/kezhenxu94/blog-code
+	url = git@github.com:kezhenxu94/blog-code

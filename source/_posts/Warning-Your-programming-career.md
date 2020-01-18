@@ -7,14 +7,6 @@ date: 2018-05-18 19:45:59
 updated: 2018-05-18 19:45:59
 ---
 
-
-> * 原文地址：[Warning: Your programming career](https://medium.com/sololearn/warning-your-programming-career-b9579b3a878b)
-> * 原文作者：[Vardan Grigoryan (vardanator)](https://medium.com/@vardanator?source=post_header_lockup)
-> * 译文出自：[掘金翻译计划](https://github.com/xitu/gold-miner)
-> * 本文永久链接：[https://github.com/xitu/gold-miner/blob/master/TODO1/warning-your-programming-career.md](https://github.com/xitu/gold-miner/blob/master/TODO1/warning-your-programming-career.md)
-> * 译者：[kezhenxu94](https://github.com/kezhenxu94/)
-> * 校对者：[swants](https://github.com/swants)
-
 ## 如何避免迷失在编程的黑色森林中
 
 ![](https://cdn-images-1.medium.com/max/2000/1*SNOF9EOlDnAViwEZAoFwmg.jpeg)

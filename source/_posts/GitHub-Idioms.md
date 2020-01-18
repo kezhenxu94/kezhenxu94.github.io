@@ -25,11 +25,11 @@ tags:
  WIP | Work In Process | 正在进行中, 如一个 PR 还没完成, 提交上去只是为了尽快获得反馈以完善 PR 时可在标题中添加 WIP, 提 PR 时也可以选择 Draft a pull request 选项 | 正在进行; 未完待续;
  AFAIK | As Far As I Know | 据我所知; | -
  AFAICT | As Far As I Can Tell | 据我所知; | -
- IMO | In My Opinion ｜ 表达自己的观点时, 用作开头; | 以我看来;
+ IMO | In My Opinion | 表达自己的观点时, 用作开头; | 以我看来;
  IMHO | In My Humble Opinion | IMO 的谦逊说法; | 以本人愚见;
  a.k.a | As Known As | 又称作, 又叫作, 以什么身份/名称被他人认识， 如在邮件列表介绍一个人真名, 别人可能对其 GitHub ID 更熟悉时, 可用: Kids the Programmer, a.k.a kezhenxu94 at Github; | - 
  ping | ping | 类似网络协议中的 ping, 表示让对方知道, 一般用来让对方在什么情况下通知自己, 如: if you have any question, feel free to ping me (如有问题, 随时戳我); | 戳;
  ACK | Acknowledgement | 同意, 收到, 在对方 ping 自己的时候, 或者对方提及自己的时候, 或者接收对方意见的时候; | 收到;
  FYI | For Your Information | 一般在一个事情上, 想让另一个人也了解一下, 以防他可能有兴趣知道, 或对他可能有影响; | 供参考;
  CC/cc | - | 类似邮件中的转发/抄送; 类似 FYI, 也是想让别人也知道这个事; | -
-  
+ POC | Prove Of Concept | 概念验证, 用于快速验证之前提出的某个观点的代码/文档; | -

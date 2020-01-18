@@ -7,14 +7,6 @@ tags:
   - Bridge Methods
 ---
 
-
-> * 原文地址：[Java bridge methods explained](http://stas-blogspot.blogspot.jp/2010/03/java-bridge-methods-explained.html)
-> * 原文作者：[STAS](http://stas-blogspot.blogspot.jp)
-> * 译文出自：[掘金翻译计划](https://github.com/xitu/gold-miner)
-> * 本文永久链接：[https://github.com/xitu/gold-miner/blob/master/TODO1/java-bridge-methods-explained.md](https://github.com/xitu/gold-miner/blob/master/TODO1/java-bridge-methods-explained.md)
-> * 译者：[kezhenxu94](https://github.com/kezhenxu94/)
-> * 校对者：[Starrier](https://github.com/Starriers/)
-
 Java 中的桥接方法是一种合成方法，在实现某些 Java 语言特性的时候是很有必要的。最为人熟知的例子就是[协变](https://docs.microsoft.com/zh-cn/dotnet/standard/generics/covariance-and-contravariance)返回值类型和泛型擦除后导致基类方法的参数与实际调用的方法参数类型不一致。
 
 看一下以下的例子：

@@ -19,7 +19,7 @@ JMH 是 Java Micro-benchmark Harness (Java 微基准测试工具) 的简称; 它
 
 ## 快速开始 JMH 测试
 
-开始 JMH 测试最简单的方式就是通过 JMH 的 Maven 原型来生成一个 JHM 项目. JMH 的 Maven 原型会生成一个 Java 工程, 其中有一个演示用的基准测试 Java 类, 以及一个 `pom.xml` 文件. `pom.xml` 文件包含了编译构建 JMH 基准测试需要的依赖;
+开始 JMH 测试最简单的方式就是通过 JMH 的 Maven 原型来生成一个 JMH 项目. JMH 的 Maven 原型会生成一个 Java 工程, 其中有一个演示用的基准测试 Java 类, 以及一个 `pom.xml` 文件. `pom.xml` 文件包含了编译构建 JMH 基准测试需要的依赖;
 
 以下是生成 JMH 工程模版所需要使用的 Maven 命令:
 

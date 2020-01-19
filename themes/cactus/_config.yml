@@ -120,6 +120,9 @@ gravatar:
   email: kezhenxu94@163.com
 
 comments:
-  gitment:
+  gitalk:
+    owner: kezhenxu94
+    admin: [kezhenxu94]
+    repo: kezhenxu94.github.io
     clientId: 7857b3ff63637b04eaf4
     clientSecret: 613a21312abd5bf0fca945e9687ea764063b14bd

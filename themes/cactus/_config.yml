@@ -119,3 +119,7 @@ baidu_analytics:
 gravatar:
   email: kezhenxu94@163.com
 
+comments:
+  gitment:
+    clientId: 7857b3ff63637b04eaf4
+    clientSecret: 613a21312abd5bf0fca945e9687ea764063b14bd

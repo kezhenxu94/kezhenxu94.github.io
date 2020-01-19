@@ -1,7 +1,17 @@
-<% if(page.comments && theme.disqus.enabled){ %>
-    <div class="blog-post-comments">
-        <div id="disqus_thread">
-            <noscript><%= __('comments.no_js') %></noscript>
-        </div>
-    </div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<% if(page.comments && theme.comments && theme.comments.gitment){ %>
+    <div id="gitment-comments"></div>
 <% } %>
+<script>
+const gitment = new Gitment({
+    id: '<%= page.title.replace(/[^\w\s]/gi, '').substring(0, 49) %>',
+    owner: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    oauth: {
+        client_id: '<%= theme.comments.gitment.clientId %>',
+        client_secret: '<%= theme.comments.gitment.clientSecret %>'
+    }
+});
+gitment.render(document.getElementById('gitment-comments'));
+</script>

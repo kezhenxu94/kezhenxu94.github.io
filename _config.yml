@@ -33,7 +33,7 @@ future: false
 highlight:
   enable: true
   line_number: true
-  auto_detect: false
+  auto_detect: true
   tab_replace: '    '
   
 index_generator:

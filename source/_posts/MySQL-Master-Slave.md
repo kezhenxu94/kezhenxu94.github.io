@@ -1,5 +1,5 @@
 ---
-title: MySQL Master Slave
+title: MySQL 主从配置
 tags:
   - MySQL
 date: 2016-03-26 13:29:21

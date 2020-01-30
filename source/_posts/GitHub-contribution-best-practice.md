@@ -1,5 +1,5 @@
 ---
-title: GitHub contribution best practice
+title: GitHub 贡献最佳实践
 date: 2020-01-15 13:07:10
 updated: 2020-01-15 13:07:10
 tags:

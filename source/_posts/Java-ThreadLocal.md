@@ -1,5 +1,5 @@
 ---
-title: Java - ThreadLocal
+title: Java - ThreadLocal 详解
 tags:
   - Java
   - Thread

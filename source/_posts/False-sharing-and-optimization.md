@@ -1,5 +1,5 @@
 ---
-title: False sharing and optimization
+title: 伪共享(False Sharing)及其优化
 date: 2020-01-22 22:04:58
 updated: 2020-01-22 22:04:58
 tags:

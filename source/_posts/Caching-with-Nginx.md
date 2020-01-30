@@ -1,5 +1,5 @@
 ---
-title: Caching with Nginx
+title: 使用 Nginx 进行缓存
 date: 2018-03-17 15:08:16
 tags: [Caching, Nginx]
 ---

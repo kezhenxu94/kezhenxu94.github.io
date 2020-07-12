@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="如何使用 JMH 编写 Java 基准测试JMH 是 Java Micro-benchmark Harness (Java 微基准测试工具) 的简称; 它能够帮助我们正确实现 Java 微基准测试, 本教程会介绍如何使用 JMH 来编写和运行 Java 微基准测试; 为何 Java 微基准测试难编写基准测试来准确测量大型应用中的某一部分是很困难的; JVM 或底层硬件的很多优化可能会在基准测试单独">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JMH - Java Micro-benchmark Harness">
+<meta property="og:url" content="http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="如何使用 JMH 编写 Java 基准测试JMH 是 Java Micro-benchmark Harness (Java 微基准测试工具) 的简称; 它能够帮助我们正确实现 Java 微基准测试, 本教程会介绍如何使用 JMH 来编写和运行 Java 微基准测试; 为何 Java 微基准测试难编写基准测试来准确测量大型应用中的某一部分是很困难的; JVM 或底层硬件的很多优化可能会在基准测试单独">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-01-18T14:01:19.000Z">
+<meta property="article:modified_time" content="2020-01-18T14:01:19.000Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Performance">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>JMH - Java Micro-benchmark Harness</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2020/01/22/False-sharing-and-optimization/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/01/15/GitHub-Idioms/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&text=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&is_video=false&description=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JMH - Java Micro-benchmark Harness&body=Check out this article: http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&name=JMH - Java Micro-benchmark Harness&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#如何使用-JMH-编写-Java-基准测试"><span class="toc-number">1.</span> <span class="toc-text">如何使用 JMH 编写 Java 基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#为何-Java-微基准测试难"><span class="toc-number">1.1.</span> <span class="toc-text">为何 Java 微基准测试难</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#快速开始-JMH-测试"><span class="toc-number">1.2.</span> <span class="toc-text">快速开始 JMH 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写基准测试"><span class="toc-number">1.3.</span> <span class="toc-text">编写基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#构建和运行"><span class="toc-number">1.4.</span> <span class="toc-text">构建和运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基准测试模式-Mode"><span class="toc-number">1.5.</span> <span class="toc-text">基准测试模式 Mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基准测试状态-State"><span class="toc-number">1.6.</span> <span class="toc-text">基准测试状态 State</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#状态域-Scope"><span class="toc-number">1.6.1.</span> <span class="toc-text">状态域 Scope</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#状态对象-Setup-和-TearDown"><span class="toc-number">1.6.2.</span> <span class="toc-text">状态对象 @Setup 和 @TearDown</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何编写正确的基准测试"><span class="toc-number">1.7.</span> <span class="toc-text">如何编写正确的基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#避免-Dead-Code-优化"><span class="toc-number">1.7.1.</span> <span class="toc-text">避免 Dead Code 优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免常量合并"><span class="toc-number">1.7.2.</span> <span class="toc-text">避免常量合并</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        JMH - Java Micro-benchmark Harness
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2020-01-18T14:01:19.000Z" itemprop="datePublished">2020-01-18</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Java/" rel="tag">Java</a>, <a class="tag-link" href="/tags/Performance/" rel="tag">Performance</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h1 id="如何使用-JMH-编写-Java-基准测试"><a href="#如何使用-JMH-编写-Java-基准测试" class="headerlink" title="如何使用 JMH 编写 Java 基准测试"></a>如何使用 JMH 编写 Java 基准测试</h1><p>JMH 是 Java Micro-benchmark Harness (Java 微基准测试工具) 的简称; 它能够帮助我们<strong>正确</strong>实现 Java 微基准测试, 本教程会介绍如何使用 JMH 来编写和运行 Java 微基准测试;</p>
+<h2 id="为何-Java-微基准测试难"><a href="#为何-Java-微基准测试难" class="headerlink" title="为何 Java 微基准测试难"></a>为何 Java 微基准测试难</h2><p>编写基准测试来准确测量大型应用中的某一部分是很困难的; JVM 或底层硬件的很多优化可能会在基准测试单独执行你的组件的时候起作用, 但是当你的组件在现实中作为大型应用中的一个部分运行时, 这些优化可能就不会奏效; 实现欠佳的微基准测试可能让你错误地觉得你的组件性能比实际上要好; 由于 JMH 的作者和实现 Java 虚拟机的人是同一批人, 所以他们很明确知道究竟要如何才能进行正确的基准测试; </p>
+<p>编写一个正确的 Java 微基准测试通常需要先禁用 JVM 和硬件的优化, 因为这些优化可能在测试运行时奏效, 但在生产环境下可能并不生效; 这就是 JMH 帮助我们做的事;</p>
+<h2 id="快速开始-JMH-测试"><a href="#快速开始-JMH-测试" class="headerlink" title="快速开始 JMH 测试"></a>快速开始 JMH 测试</h2><p>开始 JMH 测试最简单的方式就是通过 JMH 的 Maven 原型来生成一个 JMH 项目. JMH 的 Maven 原型会生成一个 Java 工程, 其中有一个演示用的基准测试 Java 类, 以及一个 <code>pom.xml</code> 文件. <code>pom.xml</code> 文件包含了编译构建 JMH 基准测试需要的依赖;</p>
+<p>以下是生成 JMH 工程模版所需要使用的 Maven 命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mvn archetype:generate \</span><br><span class="line">  -DinteractiveMode=false \</span><br><span class="line">  -DarchetypeGroupId=org.openjdk.jmh \</span><br><span class="line">  -DarchetypeArtifactId=jmh-java-benchmark-archetype \</span><br><span class="line">  -DgroupId=io.github.kezhenxu94 \</span><br><span class="line">  -DartifactId=benchmark-test \</span><br><span class="line">  -Dversion=1.0</span><br></pre></td></tr></table></figure>
+<h2 id="编写基准测试"><a href="#编写基准测试" class="headerlink" title="编写基准测试"></a>编写基准测试</h2><p>简单起见, 我们直接复用生成的基准测试类, 把我们需要进行基准测试的代码放到 <code>testMethod</code> 方法内:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> io.github.kezhenxu94;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.openjdk.jmh.annotations.Benchmark;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBenchmark</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Benchmark</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> sum = a + b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注: 以上就是一个典型的 <strong>“实现欠佳”</strong> 的基准测试的例子, 因为 JVM 发现 <code>sum</code> 这个变量实际没有被使用, 因此 JVM 可能会直接消除对 <code>sum</code> 进行求值的运行, 甚至 JVM 的 Dead Code 优化还可能将整个方法内的代码都优化掉;<br>不过我们暂且不管, 先看看如何构建和运行再说;</p>
+<h2 id="构建和运行"><a href="#构建和运行" class="headerlink" title="构建和运行"></a>构建和运行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean install</span><br></pre></td></tr></table></figure>
+<p>命令运行完成后会在 <code>target</code> 文件夹下生成 <code>benchmarks.jar</code> 文件, 其中包含了你自己写的测试代码, 以及运行 JMH 需要的依赖, 是一个完全自包含的 <code>jar</code> 包 (fat jar);</p>
+<p>有了 <code>benchmarks.jar</code> 文件之后, 就可以直接运行起来了:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -jar target/benchmarks.jar</span><br></pre></td></tr></table></figure>
+<p>运行基准测试耗时比较久, JMH 会进行一些 “预热” 操作, 还会运行多个迭代, 确保基准测试的结果稳定; 如果你运行的次数越多, 得到的结果就越准确;</p>
+<blockquote>
+<p>运行基准测试期间, 你应该尽可能不要操作电脑, 尽可能关闭所有其他的应用, 如果此时你还在运行其他应用的话, 这些应用会抢占 CPU 资源, 导致你的基准测试效果偏差;</p>
+</blockquote>
+<h2 id="基准测试模式-Mode"><a href="#基准测试模式-Mode" class="headerlink" title="基准测试模式 Mode"></a>基准测试模式 Mode</h2><p>JMH 能够在不同的模式下进行基准测试, 基准测试的类型表明你想进行测量的方向; JMH 提供了如下几种测试模式:</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 吞吐量(throughput)</td>
+<td>测量了每秒内能进行的操作次数; 也就是说基准方法每秒内能运行多少次 </td>
+</tr>
+<tr>
+<td> 平均时间(average time)</td>
+<td>测量了基准方法每次运行消耗的平均时间</td>
+</tr>
+<tr>
+<td> 采样时间(sample time)</td>
+<td>测量了基准方法的运行时间, 包括最大运行时间, 最小运行时间等</td>
+</tr>
+<tr>
+<td> 单次运行时间(single shot time)</td>
+<td>测量了基准方法运行一次需要的时间, 这是用来测试 “冷启动”(JVM 没有预热的情况) 的最佳模式</td>
+</tr>
+<tr>
+<td> 所有(all)</td>
+<td>以上所有都进行测量</td>
+</tr>
+</tbody>
+</table>
+<p>默认的测试模式是吞吐量; 可以使用注解 <code>BenchmarkMode</code> 来声明你要进行的基准测试模式;</p>
+<p>当测试模式是吞吐量的时候, 你还可以配合注解 <code>OutputTimeUnit</code> 来指定你想测试的时间单位, 比如你想测试每分钟的吞吐量, 可以使用 <code>@OutputTimeUnit(TimeUnit.MINUTES)</code>;</p>
+<h2 id="基准测试状态-State"><a href="#基准测试状态-State" class="headerlink" title="基准测试状态 State"></a>基准测试状态 State</h2><p>有时候我们的基准测试需要一些初始化操作, 但是并不想基准测试把这些初始化操作时间也测试进去, 这时候可以通过提供一些 “状态” 类, 然后 JMH 会把这些状态类的实例传递到基准方法中:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@State</span>(Scope.Thread)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyState</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> sum ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Benchmark</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMethod</span><span class="params">(MyState state)</span> </span>&#123;</span><br><span class="line">    state.sum = state.a + state.b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>MyState</code> 就是用来封装我们需要的初始状态的类, 在这个类中的操作不会被 JMH 测量;</p>
+<p>一个类要成为状态类需要符合以下几个要求:</p>
+<ul>
+<li>类修饰符必须是 <code>public</code>;</li>
+<li>如果是内部类, 必须是静态的;</li>
+<li>必须拥有无参构造函数;</li>
+</ul>
+<h3 id="状态域-Scope"><a href="#状态域-Scope" class="headerlink" title="状态域 Scope"></a>状态域 Scope</h3><p>一个状态对象可以被复用, 但是复用的范围是由状态域指定的; 有几种域可供选择, 都可以通过注解 <code>@State</code> 的参数指定:</p>
+<table>
+<thead>
+<tr>
+<th>域</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 线程(Thread)</td>
+<td>每一个运行基准测试的线程都会创建一个自己的状态对象</td>
+</tr>
+<tr>
+<td> 组(Group)</td>
+<td>每一个运行基准测试的线程组都会创建一个状态对象</td>
+</tr>
+<tr>
+<td> 基准测试(Benchmark)</td>
+<td>一个基准测试中的所有线程都共用一个状态对象</td>
+</tr>
+</tbody>
+</table>
+<h3 id="状态对象-Setup-和-TearDown"><a href="#状态对象-Setup-和-TearDown" class="headerlink" title="状态对象 @Setup 和 @TearDown"></a>状态对象 <code>@Setup</code> 和 <code>@TearDown</code></h3><p>有 JUnit 单元测试经验的朋友很容易理解这两个注解的作用, 在状态对象中, 由于状态也有生命周期, 因此可以使用这两个注解来将状态对象的方法设置为初始化和释放资源的方法; 这些生命周期方法都不会被 JMH 进行测量;</p>
+<p><code>@Setup</code> 和 <code>@TearDown</code> 也接收参数, 参数取值和含义分别如下:</p>
+<table>
+<thead>
+<tr>
+<th>取值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Level.Trial</td>
+<td>一次完整的运行, 即一次 Fork 运行, 包括预热(warm up), 和所有基准测试 iterations</td>
+</tr>
+<tr>
+<td> Level.Iteration</td>
+<td>基准测试的每个 iteration</td>
+</tr>
+<tr>
+<td> Level.Invocation</td>
+<td>基准方法每次调用</td>
+</tr>
+</tbody>
+</table>
+<h2 id="如何编写正确的基准测试"><a href="#如何编写正确的基准测试" class="headerlink" title="如何编写正确的基准测试"></a>如何编写正确的基准测试</h2><p>正如文章开头所说, 有一些很常见的陷阱容易导致基准测试不能达到实际的效果, 如 JVM 对循环的优化, Dead Code 优化;</p>
+<h3 id="避免-Dead-Code-优化"><a href="#避免-Dead-Code-优化" class="headerlink" title="避免 Dead Code 优化"></a>避免 Dead Code 优化</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBenchmark</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Benchmark</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> sum = a + b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上基准测试中, JVM 发现对 <code>sum</code> 的求值没有被使用到, 会将 <code>int sum = a + b;</code> 优化掉, 进而发现 <code>a</code> 和 <code>b</code> 也没有被使用到, 将他们也优化掉, 基准测试最终测试的方法是空方法;</p>
+<p>要避免 JVM 对 Dead Code 的优化, 我们可以将计算结果返回基准方法, 这样 JVM 就难以决定调用者是否会使用这个返回值了, 再加上 JMH 会用一些巧妙的方法来”骗过” JVM, 让它以为返回值被使用了;</p>
+<p>另一种避免 Dead Code 优化的方式是使用 JMH 提供的”黑洞”技术, 在基准方法参数中增加 <code>Blackhole blackhole</code>, 然后在方法内使用 <code>blackhole.consume</code> 来”使用”这些原来没有用到的值;</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBenchmark</span> </span>&#123;</span><br><span class="line">   <span class="meta">@Benchmark</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMethod</span><span class="params">(Blackhole blackhole)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> sum = a + b;</span><br><span class="line">        blackhole.consume(sum);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="避免常量合并"><a href="#避免常量合并" class="headerlink" title="避免常量合并"></a>避免常量合并</h3><p>常量合并是 JVM 常用的另一个优化点; 基于常量的计算通常会产生常量的结果, 不管被运行多少次, JVM 可能会检测到这一点, 并且直接将表达式求值的地方替换成常量; 避免常量合并的方法可以利用前面提到的 <a href="#基准测试状态-State">状态对象</a></p>
+<blockquote>
+<p>参考: <a href="http://tutorials.jenkov.com/java-performance/jmh.html#getting-started-with-jmh" target="_blank" rel="noopener">http://tutorials.jenkov.com/java-performance/jmh.html#getting-started-with-jmh</a></p>
+</blockquote>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#如何使用-JMH-编写-Java-基准测试"><span class="toc-number">1.</span> <span class="toc-text">如何使用 JMH 编写 Java 基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#为何-Java-微基准测试难"><span class="toc-number">1.1.</span> <span class="toc-text">为何 Java 微基准测试难</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#快速开始-JMH-测试"><span class="toc-number">1.2.</span> <span class="toc-text">快速开始 JMH 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编写基准测试"><span class="toc-number">1.3.</span> <span class="toc-text">编写基准测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#构建和运行"><span class="toc-number">1.4.</span> <span class="toc-text">构建和运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基准测试模式-Mode"><span class="toc-number">1.5.</span> <span class="toc-text">基准测试模式 Mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基准测试状态-State"><span class="toc-number">1.6.</span> <span class="toc-text">基准测试状态 State</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#状态域-Scope"><span class="toc-number">1.6.1.</span> <span class="toc-text">状态域 Scope</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#状态对象-Setup-和-TearDown"><span class="toc-number">1.6.2.</span> <span class="toc-text">状态对象 @Setup 和 @TearDown</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何编写正确的基准测试"><span class="toc-number">1.7.</span> <span class="toc-text">如何编写正确的基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#避免-Dead-Code-优化"><span class="toc-number">1.7.1.</span> <span class="toc-text">避免 Dead Code 优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#避免常量合并"><span class="toc-number">1.7.2.</span> <span class="toc-text">避免常量合并</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&text=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&is_video=false&description=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JMH - Java Micro-benchmark Harness&body=Check out this article: http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&title=JMH - Java Micro-benchmark Harness" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2020/01/18/JMH-Java-Microbenchmark-Harness/&name=JMH - Java Micro-benchmark Harness&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

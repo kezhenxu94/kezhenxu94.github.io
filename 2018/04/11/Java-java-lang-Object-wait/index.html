@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="Why java.lang.Object从 wait 方法的完整方法签名可以看出, wait 方法是定义在 java.lang.Object 类中的方法; 众所周知, 在 Java 中 Object 类是所有类的父类, 要了解 Java 类库的设计者把 wait 方法定义在这样一个超级父类中的原因, 就先要了解 等待集合 (Wait Sets) 的概念; Wait Sets在 Java 中, 所有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java java.lang.Object#wait">
+<meta property="og:url" content="http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="Why java.lang.Object从 wait 方法的完整方法签名可以看出, wait 方法是定义在 java.lang.Object 类中的方法; 众所周知, 在 Java 中 Object 类是所有类的父类, 要了解 Java 类库的设计者把 wait 方法定义在这样一个超级父类中的原因, 就先要了解 等待集合 (Wait Sets) 的概念; Wait Sets在 Java 中, 所有">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-04-11T03:31:04.000Z">
+<meta property="article:modified_time" content="2018-04-11T03:31:04.000Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Concurrent">
+<meta property="article:tag" content="Thread">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>Java java.lang.Object#wait</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/04/12/EnumSet-A-Special-Set/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/04/09/Load-Balancing-with-Nginx/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&text=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&is_video=false&description=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java java.lang.Object#wait&body=Check out this article: http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&name=Java java.lang.Object#wait&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-java-lang-Object"><span class="toc-number">1.</span> <span class="toc-text">Why java.lang.Object</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wait-Sets"><span class="toc-number">2.</span> <span class="toc-text">Wait Sets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-wait-and-notify"><span class="toc-number">3.</span> <span class="toc-text">Using wait and notify</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Producer-Consumer"><span class="toc-number">3.1.</span> <span class="toc-text">Producer-Consumer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Producer"><span class="toc-number">3.2.</span> <span class="toc-text">Producer</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java java.lang.Object#wait
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-04-11T03:31:04.000Z" itemprop="datePublished">2018-04-11</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Concurrent/" rel="tag">Concurrent</a>, <a class="tag-link" href="/tags/Java/" rel="tag">Java</a>, <a class="tag-link" href="/tags/Thread/" rel="tag">Thread</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Why-java-lang-Object"><a href="#Why-java-lang-Object" class="headerlink" title="Why java.lang.Object"></a>Why <code>java.lang.Object</code></h2><p>从 <code>wait</code> 方法的完整方法签名可以看出, <code>wait</code> 方法是定义在 <code>java.lang.Object</code> 类中的方法; 众所周知, 在 Java 中 <code>Object</code> 类是所有类的父类, 要了解 Java 类库的设计者把 <code>wait</code> 方法定义在这样一个超级父类中的原因, 就先要了解 <strong>等待集合 (Wait Sets)</strong> 的概念;</p>
+<h2 id="Wait-Sets"><a href="#Wait-Sets" class="headerlink" title="Wait Sets"></a>Wait Sets</h2><p>在 Java 中, 所有的对象都关联了一个<strong>等待集合</strong>, <strong>等待集合</strong>是一个线程的集合, 在这个集合中的所有线程都在等待着某个事件的发生;</p>
+<p>从 Java 语言层面, 修改一个对象关联的<strong>等待集合</strong>的操作只有通过调用该对象的 <code>wait</code>, <code>notify</code> 或 <code>notifyAll</code> 方法, 一个拥有该对象锁的线程调用其 <code>wait</code> 方法将会把自己放到该对象的等待集合中, 而调用该对象的 <code>notifyAll</code> 方法将会把该对象关联的等待集合中的所有线程唤醒并移出等待集合;</p>
+<p>由此可见, 上述 “等待集合中的所有线程都在等待某个事件的发生” 中的 “事件” 就是 “其他线程调用该对象的 <code>notify</code> 或 <code>notifyAll</code> 方法 (也可能是该线程的中断异常);</p>
+<p>因为所有对象都关联了一个等待集合, <code>wait</code>, <code>notify</code>, <code>notifyAll</code> 是修改等待集合的唯一方法, 所以所有对象也都必须有这三个方法, 将 <code>wait</code>, <code>notify</code>, <code>notifyAll</code> 方法定义在 <code>Object</code> 类中似乎也就合理了;</p>
+<blockquote>
+<p>关于 Wait Sets 的更多详情, 可以查看 <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-17.html#jls-17.2" target="_blank" rel="noopener">Java 语言规范文档</a></p>
+</blockquote>
+<h2 id="Using-wait-and-notify"><a href="#Using-wait-and-notify" class="headerlink" title="Using wait and notify"></a>Using <code>wait</code> and <code>notify</code></h2><p>如前所述, <code>wait</code>, <code>notify</code> 和 <code>notifyAll</code> 方法是修改等待集合中的线程的状态的方法: </p>
+<ul>
+<li><code>a.wait()</code>: 将当前线程放到对象 <code>a</code> 的等待集合中;</li>
+<li><code>a.notifyAll()</code>: 将对象 <code>a</code> 等待集合中的所有线程唤醒;</li>
+<li><code>a.notify()</code>: 将对象 <code>a</code> 等待集合中的随机一个线程唤醒;</li>
+</ul>
+<h3 id="Producer-Consumer"><a href="#Producer-Consumer" class="headerlink" title="Producer-Consumer"></a>Producer-Consumer</h3><p>从 <code>wait</code> 和 <code>notify</code> 方法对线程产生的影响来看, 他们的作用更多是作为线程之间的协调机制, 关于线程之间的协调在 “生产者-消费者” 场景下比较常见, 以下将使用 <code>wait</code> 和 <code>notifyAll</code> 方法实现一个最简单的 “生成者-消费者” 示例;</p>
+<blockquote>
+<p>完整的示例代码可以在 <a href="https://github.com/kezhenxu94/blog-code/tree/master/Java-java-lang-Object-wait" target="_blank" rel="noopener">这里</a> 找到</p>
+</blockquote>
+<h3 id="Producer"><a href="#Producer" class="headerlink" title="Producer"></a>Producer</h3><p>生产者的代码如下:</p>
+<figure class="highlight java"><figcaption><span>IntegerProducer.java</span><a href="/downloads/code/Java-java-lang-Object-wait/src/me/kezhenxu94/blog/IntegerProducer.java">view raw</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> me.kezhenxu94.blog;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by kid on 2018/4/11.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> kezhenxu (kezhenxu94 at 163 dot com)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IntegerProducer</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>{</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> number = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Resources&lt;Integer&gt; resources;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">IntegerProducer</span><span class="params">(Resources&lt;Integer&gt; resources)</span> </span>{</span><br><span class="line">        <span class="keyword">this</span>.resources = resources;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"InfiniteLoopStatement"</span>)</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>{</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) {</span><br><span class="line">            <span class="keyword">try</span> {</span><br><span class="line">                <span class="keyword">synchronized</span> (resources) {</span><br><span class="line">                    <span class="keyword">while</span> (!resources.isEmpty()) {</span><br><span class="line">                        resources.wait();</span><br><span class="line">                    }</span><br><span class="line">                    resources.set(number++);</span><br><span class="line">                    resources.notifyAll();</span><br><span class="line">                }</span><br><span class="line">                Thread.sleep(<span class="number">500L</span>);</span><br><span class="line">            } <span class="keyword">catch</span> (InterruptedException e) {</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<p>其中需要注意的是:</p>
+<ul>
+<li><p>在调用 <code>resources.wait()</code> 时, 当前线程必须拥有 <code>resources</code> 的锁, 否则将抛出 <code>IllegalMonitorStateException</code> 异常, 这就是在调用 <code>resources.wait()</code> 方法时用 <code>synchronized (resources)</code> 同步代码块包围的原因, 确保在进入该代码块时当前线程拥有 <code>resources</code> 的锁;</p>
+</li>
+<li><p>当线程从 <code>resources.wait()</code> 处接着往下执行的时候, 即被其他线程通过 <code>resources.notifyAll()</code> 方法唤醒的时候, 生产者并没有马上生产资源, 而是需要再次检查资源是否已经满了, 这是因为当消费者消费完资源调用 <code>resources.notifyAll()</code> 之后, 等待集合中的所有线程会重新开始竞争 <code>resources</code> 的锁, 此时可能是另外的生产者获得了锁并且生产资源使资源满了, 这就是需要使用 <code>while (resources.isEmpty())</code> 包围 <code>resources.wait()</code> 的原因;</p>
+</li>
+</ul>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-java-lang-Object"><span class="toc-number">1.</span> <span class="toc-text">Why java.lang.Object</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Wait-Sets"><span class="toc-number">2.</span> <span class="toc-text">Wait Sets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-wait-and-notify"><span class="toc-number">3.</span> <span class="toc-text">Using wait and notify</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Producer-Consumer"><span class="toc-number">3.1.</span> <span class="toc-text">Producer-Consumer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Producer"><span class="toc-number">3.2.</span> <span class="toc-text">Producer</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&text=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&is_video=false&description=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java java.lang.Object#wait&body=Check out this article: http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&title=Java java.lang.Object#wait" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/04/11/Java-java-lang-Object-wait/&name=Java java.lang.Object#wait&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2020 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

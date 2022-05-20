@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="BackgroundMySQL 主从服务器的作用之一是备份, 配置为从服务器 (slave) 的 MySQL 服务器将主服务器 (master) 发生的修改动作同步过来, 当主服务器发生故障的时候, 从服务器可以迅速替代主服务器提供服务. 关于 MySQL 主从服务器的配置本来非常简单, 但网上的配置教程也让我眼花缭乱, 有的教程使用的服务器版本过旧, 而 MySQL 更新非常快, 以前旧版本的配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 主从配置">
+<meta property="og:url" content="http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="BackgroundMySQL 主从服务器的作用之一是备份, 配置为从服务器 (slave) 的 MySQL 服务器将主服务器 (master) 发生的修改动作同步过来, 当主服务器发生故障的时候, 从服务器可以迅速替代主服务器提供服务. 关于 MySQL 主从服务器的配置本来非常简单, 但网上的配置教程也让我眼花缭乱, 有的教程使用的服务器版本过旧, 而 MySQL 更新非常快, 以前旧版本的配">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-03-26T05:29:21.000Z">
+<meta property="article:modified_time" content="2018-04-10T09:41:21.000Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>MySQL 主从配置</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/03/17/Caching-with-Nginx/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2016/03/03/Java-ThreadLocal/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&text=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&is_video=false&description=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=MySQL 主从配置&body=Check out this article: http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&name=MySQL 主从配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-number">2.</span> <span class="toc-text">Prerequisites</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Solution"><span class="toc-number">3.</span> <span class="toc-text">Solution</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-Account"><span class="toc-number">3.1.</span> <span class="toc-text">Creating Account</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mofifying-Configurations"><span class="toc-number">3.2.</span> <span class="toc-text">Mofifying Configurations</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Master-Configuration"><span class="toc-number">3.2.1.</span> <span class="toc-text">Master Configuration</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Slaves-Configuration"><span class="toc-number">3.2.2.</span> <span class="toc-text">Slaves Configuration</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Running"><span class="toc-number">4.</span> <span class="toc-text">Running</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Result"><span class="toc-number">5.</span> <span class="toc-text">Result</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testing"><span class="toc-number">6.</span> <span class="toc-text">Testing</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Master"><span class="toc-number">6.1.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves"><span class="toc-number">6.2.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-1"><span class="toc-number">6.3.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-1"><span class="toc-number">6.4.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-2"><span class="toc-number">6.5.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-2"><span class="toc-number">6.6.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-3"><span class="toc-number">6.7.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-3"><span class="toc-number">6.8.</span> <span class="toc-text">Slaves</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-Docker"><span class="toc-number">7.</span> <span class="toc-text">Using Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Summary"><span class="toc-number">8.</span> <span class="toc-text">Summary</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        MySQL 主从配置
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-03-26T05:29:21.000Z" itemprop="datePublished">2016-03-26</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/MySQL/" rel="tag">MySQL</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>MySQL 主从服务器的作用之一是备份, 配置为从服务器 (slave) 的 MySQL 服务器将主服务器 (master) 发生的修改动作同步过来, 当主服务器发生故障的时候, 从服务器可以迅速替代主服务器提供服务.</p>
+<p>关于 MySQL 主从服务器的配置本来非常简单, 但网上的配置教程也让我眼花缭乱, 有的教程使用的服务器版本过旧, 而 MySQL 更新非常快, 以前旧版本的配置方法在新版本上没法正确工作, 另一方面, 为了避免以后遗忘还得在这些令人眼花缭乱的教程中甄选, 特此记录. </p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><p>本文使用的环境为:</p>
+<ul>
+<li><p>OS: macOS High Sierra</p>
+</li>
+<li><p>MySQL: 5.7.9</p>
+</li>
+<li><p>Docker(Optional): 18.03.0-ce-mac59 (23608)</p>
+</li>
+</ul>
+<h2 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h2><h3 id="Creating-Account"><a href="#Creating-Account" class="headerlink" title="Creating Account"></a>Creating Account</h3><p>由于从服务器要从主服务器同步数据, 因此必须有可以访问到主服务器的一个 <code>MySQL</code> 账户, 从安全和方便管理方面看, 建议为从服务器专门新建一个账户. 命令如下, 在主服务器上运行: </p>
+<figure class="highlight plain"><figcaption><span>master</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; grant replication slave on *.* to &#39;slave&#39;@&#39;%&#39; identified by &#39;slave&#39;;</span><br><span class="line">Query OK, 0 rows affected, 1 warning (0.01 sec)</span><br></pre></td></tr></table></figure>
+<p>以上语句执行成功, 但有一个 <code>warning</code> , 因为使用 <code>grant</code> 语句创建用户的方法在新版本已经不建议使用了, 在未来版本可能被移除, 因此可以使用下面两句代替: </p>
+<figure class="highlight plain"><figcaption><span>master</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; create user slave identified by &#39;slave&#39;;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; grant replication slave on *.* to slave;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="Mofifying-Configurations"><a href="#Mofifying-Configurations" class="headerlink" title="Mofifying Configurations"></a>Mofifying Configurations</h3><h4 id="Master-Configuration"><a href="#Master-Configuration" class="headerlink" title="Master Configuration"></a>Master Configuration</h4><p>MySQL 服务器配置文件是 MySQL 服务程序 mysqld 运行时会去读取的配置文件, 在 <code>*inux</code> 系统下, 其名字为 <code>my.cnf</code> , 在 <code>windows</code> 下名字为 <code>my.ini</code> , <code>my.cnf</code> 文件可以有多个, <code>mysqld</code> 读取的顺序可以使用 <code>mysqld --help | grep my.cnf</code> 查看: </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mysql --<span class="built_in">help</span>|grep my.cnf</span></span><br><span class="line">                  order of preference, my.cnf, $MYSQL_TCP_PORT,</span><br><span class="line">/etc/my.cnf /etc/mysql/my.cnf /usr/local/mysql/etc/my.cnf /opt/mysql/my.cnf ~/.my.cnf</span><br></pre></td></tr></table></figure>
+<p>因此可以修改上述中的任何一个文件, 以下将修改 <code>/etc/my.cnf</code> 文件, 修改如下: </p>
+<figure class="highlight plain"><figcaption><span>/etc/my.cnf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">server-id&#x3D;1000</span><br><span class="line">log-bin&#x3D;</span><br></pre></td></tr></table></figure>
+<p><code>[mysqld]</code> 表示配置的一个组, <code>mysqld</code> 启动会使用这个组下面的配置, 给主服务器配置个服务器 <code>id</code> 为 <code>12345</code> , <code>log-bin=</code> 表示激活二进制更新日志, 由于 <code>MySQL</code> 主从服务器通过二进制更新日志来同步, 所以要激活它, 等号后表示日志存放路径, 缺省表示由 <code>MySQL</code> 的默认位置决定. </p>
+<h4 id="Slaves-Configuration"><a href="#Slaves-Configuration" class="headerlink" title="Slaves Configuration"></a>Slaves Configuration</h4><p>在 <code>~/.my.cnf</code> 或其它 <code>my.cnf</code> 配置文件中为从服务器指定一个 <code>server-id</code>:</p>
+<figure class="highlight plain"><figcaption><span>~/.my.cnf</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line">server-id&#x3D;1001</span><br></pre></td></tr></table></figure>
+<p>登陆从服务器, 配置从服务器 <strong>归属</strong> 的主服务器:</p>
+<figure class="highlight plain"><figcaption><span>slaves</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to master_host&#x3D;&#39;host&#39;, master_user&#x3D;&#39;slave&#39;, master_password&#x3D;&#39;slave&#39;;</span><br><span class="line">Query OK, 0 rows affected, 2 warnings (0.03 sec)</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li><code>host</code>: 主服务器所在的 <code>IP</code> 地址或域名, 如果是本地则是 <code>localhost</code> </li>
+<li><code>master_user</code> 和 <code>master_password</code>: <code>步骤 1</code> 中为从服务器创建的账户和密码, 如果该语句执行出现以下错误, <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ERROR 3021 (HY000): This operation cannot be performed with a </span><br><span class="line">running slave io thread; run STOP SLAVE IO_THREAD FOR CHANNEL &#39;&#39; first.</span><br></pre></td></tr></table></figure>
+  则说明已经有从服务器在运行, 先要停止它. <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; stop slave;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Running"><a href="#Running" class="headerlink" title="Running"></a>Running</h2><p>为了使修改后的配置文件生效, 使用以下命令重启 MySQL 服务器. </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 停止服务器</span><br><span class="line"><span class="meta">$</span><span class="bash"> mysqladmin -uroot -p shutdown</span></span><br><span class="line">Enter password:</span><br><span class="line">// 启动服务器</span><br><span class="line"><span class="meta">$</span><span class="bash"> mysqld_safe --user=mysql&amp;</span></span><br><span class="line">2016-03-26T05:47:02.783806Z mysqld_safe Logging to '/usr/local/mysql/data/log.error'.</span><br><span class="line">2016-03-26T05:47:02.805345Z mysqld_safe Starting mysqld daemon with databases from /usr/local/mysql/data</span><br></pre></td></tr></table></figure>
+<h2 id="Result"><a href="#Result" class="headerlink" title="Result"></a>Result</h2><p>使用以下命令查看服务器的状态:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show slave status\G;</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: 139.129.118.26</span><br><span class="line">                  Master_User: slave</span><br><span class="line">                  Master_Port: 3306</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: iZ28dfovkdxZ-bin.000001</span><br><span class="line">          Read_Master_Log_Pos: 154</span><br><span class="line">               Relay_Log_File: KeZhenxus-MacBook-Pro-relay-bin.000002</span><br><span class="line">                Relay_Log_Pos: 381</span><br><span class="line">        Relay_Master_Log_File: iZ28dfovkdxZ-bin.000001</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">                   Last_Errno: 0</span><br><span class="line">                   Last_Error: </span><br><span class="line">                 Skip_Counter: 0</span><br><span class="line">          Exec_Master_Log_Pos: 154</span><br><span class="line">              Relay_Log_Space: 604</span><br><span class="line">              Until_Condition: None</span><br><span class="line">               Until_Log_File: </span><br><span class="line">                Until_Log_Pos: 0</span><br><span class="line">           Master_SSL_Allowed: No</span><br><span class="line">           Master_SSL_CA_File: </span><br><span class="line">           Master_SSL_CA_Path: </span><br><span class="line">              Master_SSL_Cert: </span><br><span class="line">            Master_SSL_Cipher: </span><br><span class="line">               Master_SSL_Key: </span><br><span class="line">        Seconds_Behind_Master: 0</span><br><span class="line">Master_SSL_Verify_Server_Cert: No</span><br><span class="line">                Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error: </span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error: </span><br><span class="line">  Replicate_Ignore_Server_Ids: </span><br><span class="line">             Master_Server_Id: 12345</span><br><span class="line">                  Master_UUID: bc6aa90b-f182-11e5-9cb9-00163e001113</span><br><span class="line">             Master_Info_File: &#x2F;usr&#x2F;local&#x2F;mysql&#x2F;data&#x2F;master.info</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">      Slave_SQL_Running_State: Slave has read all relay log; waiting for more updates</span><br><span class="line">           Master_Retry_Count: 86400</span><br><span class="line">                  Master_Bind: </span><br><span class="line">      Last_IO_Error_Timestamp: </span><br><span class="line">     Last_SQL_Error_Timestamp: </span><br><span class="line">               Master_SSL_Crl: </span><br><span class="line">           Master_SSL_Crlpath: </span><br><span class="line">           Retrieved_Gtid_Set: </span><br><span class="line">            Executed_Gtid_Set: </span><br><span class="line">                Auto_Position: 0</span><br><span class="line">         Replicate_Rewrite_DB: </span><br><span class="line">                 Channel_Name: </span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">ERROR: </span><br><span class="line">No query specified</span><br></pre></td></tr></table></figure>
+<p>其中两句表明配置成功:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br></pre></td></tr></table></figure></p>
+<h2 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h2><p>在主服务器上登陆, 创建数据库, 表, 插入数据: </p>
+<h3 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; create database master_db;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; use master_db;</span><br><span class="line">Database changed</span><br><span class="line">mysql&gt; create table master_table(</span><br><span class="line">    -&gt; ii int unsigned primary key auto_increment,</span><br><span class="line">    -&gt; cc char(10));</span><br><span class="line">Query OK, 0 rows affected (0.05 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="Slaves"><a href="#Slaves" class="headerlink" title="Slaves"></a>Slaves</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| master_db          |	&lt;------- 出现了</span><br><span class="line">| message            |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">| test               |</span><br><span class="line">+--------------------+</span><br></pre></td></tr></table></figure>
+<h3 id="Master-1"><a href="#Master-1" class="headerlink" title="Master"></a>Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; insert into master_table(cc) select &#39;I\&#39;m master&#39;;</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">Records: 1  Duplicates: 0  Warnings: 0</span><br></pre></td></tr></table></figure>
+<h3 id="Slaves-1"><a href="#Slaves-1" class="headerlink" title="Slaves"></a>Slaves</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from master_table;</span><br><span class="line">+----+------------+</span><br><span class="line">| ii | cc         |</span><br><span class="line">+----+------------+</span><br><span class="line">|  1 | I&#39;m master |</span><br><span class="line">+----+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="Master-2"><a href="#Master-2" class="headerlink" title="Master"></a>Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-- 禁用自动提交事务</span><br><span class="line">mysql&gt; set autocommit&#x3D;off;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line">-- 开启一个事务</span><br><span class="line">mysql&gt; begin;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line">-- 插入一行数据</span><br><span class="line">mysql&gt; insert into master_table(cc) select cc from master_table;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line">Records: 1  Duplicates: 0  Warnings: 0</span><br><span class="line">-- 本事务内确认插入</span><br><span class="line">mysql&gt; select * from master_table;</span><br><span class="line">+----+------------+</span><br><span class="line">| ii | cc         |</span><br><span class="line">+----+------------+</span><br><span class="line">|  1 | I&#39;m master |</span><br><span class="line">|  2 | I&#39;m master |</span><br><span class="line">+----+------------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br><span class="line">-- 还没提交事务</span><br></pre></td></tr></table></figure>
+<h3 id="Slaves-2"><a href="#Slaves-2" class="headerlink" title="Slaves"></a>Slaves</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from master_table;</span><br><span class="line">+----+------------+</span><br><span class="line">| ii | cc         |</span><br><span class="line">+----+------------+</span><br><span class="line">|  1 | I&#39;m master |</span><br><span class="line">+----+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>没有新的数据</p>
+<h3 id="Master-3"><a href="#Master-3" class="headerlink" title="Master"></a>Master</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; commit;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br></pre></td></tr></table></figure>
+<h3 id="Slaves-3"><a href="#Slaves-3" class="headerlink" title="Slaves"></a>Slaves</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * from master_table;</span><br><span class="line">+----+------------+</span><br><span class="line">| ii | cc         |</span><br><span class="line">+----+------------+</span><br><span class="line">|  1 | I&#39;m master |</span><br><span class="line">|  2 | I&#39;m master |</span><br><span class="line">+----+------------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>此时从服务器才有新数据</p>
+<h2 id="Using-Docker"><a href="#Using-Docker" class="headerlink" title="Using Docker"></a>Using Docker</h2><p>可以在 <a href="https://github.com/kezhenxu94/blog-code/tree/master/mysql-master-slaves" target="_blank" rel="noopener">GitHub</a> 上获取到 docker-compose 文件, 使用以下命令启动 docker 容器, 待容器运行稳定之后, 就可以得到一个主服务器和两个从服务器;</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-compose up</span></span><br></pre></td></tr></table></figure>
+<p>连接上主服务器:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mysql -uroot -pmaster -h 127.0.0.1 -P3306</span></span><br></pre></td></tr></table></figure>
+<p>连接上从服务器:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mysql -uroot -pslave0 -h 127.0.0.1 -P3307 <span class="comment"># slave0</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mysql -uroot -pslave1 -h 127.0.0.1 -P3308 <span class="comment"># slave1</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>也就是说, 从服务器并不 “盲从” 主服务器, 因为开启一个事务时, 有可能会回滚该事务, 一旦会滚该事务, 那么从服务器的这次修改就白费了, 另外还白白浪费了网络的传输;</p>
+<p>根本原因是从服务器是根据主服务器的 “二进制更新日志” (即 <code>my.cnf</code> 中配置的 <code>log-bin</code>) 来进行同步的, 而主服务器在事务没有提交之前不会将修改更新到 “二进制更新日志” 中, 因此从服务器也就不会收到同步的命令. </p>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-number">2.</span> <span class="toc-text">Prerequisites</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Solution"><span class="toc-number">3.</span> <span class="toc-text">Solution</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Creating-Account"><span class="toc-number">3.1.</span> <span class="toc-text">Creating Account</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mofifying-Configurations"><span class="toc-number">3.2.</span> <span class="toc-text">Mofifying Configurations</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Master-Configuration"><span class="toc-number">3.2.1.</span> <span class="toc-text">Master Configuration</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Slaves-Configuration"><span class="toc-number">3.2.2.</span> <span class="toc-text">Slaves Configuration</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Running"><span class="toc-number">4.</span> <span class="toc-text">Running</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Result"><span class="toc-number">5.</span> <span class="toc-text">Result</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Testing"><span class="toc-number">6.</span> <span class="toc-text">Testing</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Master"><span class="toc-number">6.1.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves"><span class="toc-number">6.2.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-1"><span class="toc-number">6.3.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-1"><span class="toc-number">6.4.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-2"><span class="toc-number">6.5.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-2"><span class="toc-number">6.6.</span> <span class="toc-text">Slaves</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Master-3"><span class="toc-number">6.7.</span> <span class="toc-text">Master</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Slaves-3"><span class="toc-number">6.8.</span> <span class="toc-text">Slaves</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-Docker"><span class="toc-number">7.</span> <span class="toc-text">Using Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Summary"><span class="toc-number">8.</span> <span class="toc-text">Summary</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&text=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&is_video=false&description=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=MySQL 主从配置&body=Check out this article: http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&title=MySQL 主从配置" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2016/03/26/MySQL-Master-Slave/&name=MySQL 主从配置&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

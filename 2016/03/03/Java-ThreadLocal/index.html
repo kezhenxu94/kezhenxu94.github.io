@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="Lifecycle of Variables在 JDK 源代码中对类 ThreadLocal 的部分注释如下:  This class provides thread-local variables. These variables differ from their normal counterparts in that each thread that accesses one (via it">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java - ThreadLocal 详解">
+<meta property="og:url" content="http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="Lifecycle of Variables在 JDK 源代码中对类 ThreadLocal 的部分注释如下:  This class provides thread-local variables. These variables differ from their normal counterparts in that each thread that accesses one (via it">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-03-03T04:18:42.000Z">
+<meta property="article:modified_time" content="2016-03-03T04:18:42.000Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Concurrent">
+<meta property="article:tag" content="Thread">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>Java - ThreadLocal 详解</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2016/03/26/MySQL-Master-Slave/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&text=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&is_video=false&description=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java - ThreadLocal 详解&body=Check out this article: http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&name=Java - ThreadLocal 详解&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lifecycle-of-Variables"><span class="toc-number">1.</span> <span class="toc-text">Lifecycle of Variables</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Static-Variables"><span class="toc-number">1.1.</span> <span class="toc-text">Static Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Member-Variables"><span class="toc-number">1.2.</span> <span class="toc-text">Member Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Variables"><span class="toc-number">1.3.</span> <span class="toc-text">Local Variables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal"><span class="toc-number">2.</span> <span class="toc-text">ThreadLocal</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MyThreadLocal"><span class="toc-number">3.</span> <span class="toc-text">MyThreadLocal</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MyThreadLocal-V1"><span class="toc-number">3.1.</span> <span class="toc-text">MyThreadLocal V1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MyThreadLocal-V2-using-Map"><span class="toc-number">3.2.</span> <span class="toc-text">MyThreadLocal V2 using Map</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-ThreadLocal"><span class="toc-number">4.</span> <span class="toc-text">Using ThreadLocal</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Initializing-in-Java-8"><span class="toc-number">5.</span> <span class="toc-text">Initializing in Java 8</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java - ThreadLocal 详解
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2016-03-03T04:18:42.000Z" itemprop="datePublished">2016-03-03</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Concurrent/" rel="tag">Concurrent</a>, <a class="tag-link" href="/tags/Java/" rel="tag">Java</a>, <a class="tag-link" href="/tags/Thread/" rel="tag">Thread</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Lifecycle-of-Variables"><a href="#Lifecycle-of-Variables" class="headerlink" title="Lifecycle of Variables"></a>Lifecycle of Variables</h2><p>在 JDK 源代码中对类 <code>ThreadLocal</code> 的部分注释如下:</p>
+<blockquote>
+<p>This class provides thread-local variables. These variables differ from their normal counterparts in that each thread that accesses one (via its {@code get} or {@code set} method) has its own, independently initialized copy of the variable.  {@code ThreadLocal} instances are typically private static fields in classes that wish to associate state with a thread (e.g., a user ID or Transaction ID).</p>
+</blockquote>
+<blockquote>
+<p>该类提供了线程局部变量. 这些变量与一般情况下它们所对应的变量不同, 不同之处在于每一个访问该变量 (通过 get 或 set 方法) 的线程都有自己对该变量的一份拷贝. ThreadLocal 类的实例典型地是 private static 字段, 这些字段是希望与一个线程相关联的状态 (如: 一个用户的 id 或一个事务的 id) .</p>
+</blockquote>
+<p>正如作者所说, <code>ThreadLocal</code> 是提供 <strong>线程局部变量</strong> 的类. 在 Java 语言中, 关于变量的作用域/生命周期大概有以下几种:</p>
+<h3 id="Static-Variables"><a href="#Static-Variables" class="headerlink" title="Static Variables"></a>Static Variables</h3><p>即静态变量或类变量, 也就是在类声明中使用 <code>static</code> 修饰的变量, 例如在 <code>java.lang.Double</code> 类中有如下类变量:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> POSITIVE_INFINITY = <span class="number">1.0</span> / <span class="number">0.0</span>;</span><br></pre></td></tr></table></figure>
+<p>该类的所有实例共享该变量的同一份副本, 该变量的生命周期最长, 从该类被加载开始到该类被卸载 (如果有的话, 否则直到虚拟机关闭).</p>
+<h3 id="Member-Variables"><a href="#Member-Variables" class="headerlink" title="Member Variables"></a>Member Variables</h3><p>即成员变量, 也就是在类声明中的普通变量. 该类的每个实例各自拥有该变量的一个副本, 该变量的生命周期从实例化该类的一个对象开始, 到该对象被垃圾回收为止.</p>
+<h3 id="Local-Variables"><a href="#Local-Variables" class="headerlink" title="Local Variables"></a>Local Variables</h3><p>即局部变量, 通常所说的局部变量是指在方法中声明的变量, 如 <code>java.lang.Double</code> 类中有如下方法:</p>
+<figure class="highlight java"><figcaption><span>java.lang.Double.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(<span class="keyword">double</span> value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> bits = doubleToLongBits(value);</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">int</span>)(bits ^ (bits &gt;&gt;&gt; <span class="number">32</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>bits</code> 即为局部变量, 超出该方法时 <code>bits</code> 变量便不可访问; 准确来说, 该变量是一个 “方法局部变量 (method-local Variable)”.</p>
+<p>“局部” 是一个相对的范围, 局部指的是相对于其外部的范围而言, 例如在如下代码中:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> outter = <span class="number">1</span>;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> inner = <span class="number">100</span>;</span><br><span class="line">        System.out.println (inner);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 不可访问 inner */</span></span><br><span class="line">    System.out.println (outter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>变量 <code>inner</code> 处在代码块中, 其生命周期仅在该代码块内部有效, 因此该变量也可以叫做一个 “代码块局部变量 (code-block-local Variable)”.</p>
+<h2 id="ThreadLocal"><a href="#ThreadLocal" class="headerlink" title="ThreadLocal"></a>ThreadLocal</h2><p>现在回到 <code>ThreadLocal</code> 中来, Java 文档说 <code>ThreadLocal</code> 类是为提供 <code>thread-local</code> 的变量而设计的, 可以联想到 <strong>该变量的生命周期应该是在一个线程开始时到一个线程结束时</strong>. 使用该 <code>ThreadLocal</code> 包装的变量可以保证同一个线程多次访问该变量访问的都是同一个副本, 而不同线程访问该变量访问的都是不同的副本. 由此可以很明显的看到线程与该变量的对应关系是一对一关系 (one-to-one) , 自然而然想到使用 <code>Map</code> 数据结构来存放这种关系, 使用线程作为 <code>Key</code> , 该线程对应的变量作为 <code>Value</code>;</p>
+<p>接下来将编写一个简单 <code>ThreadLocal</code> 类, 编写该类的目的不是要取代 JDK 中的 <code>ThreadLocal</code> 类, 而是为了更好地理解该类的原理.</p>
+<h2 id="MyThreadLocal"><a href="#MyThreadLocal" class="headerlink" title="MyThreadLocal"></a>MyThreadLocal</h2><h3 id="MyThreadLocal-V1"><a href="#MyThreadLocal-V1" class="headerlink" title="MyThreadLocal V1"></a>MyThreadLocal V1</h3><p>上面提到, <code>ThreadLocal</code> 类目的就是为了提供一个线程局部的变量, 因此该类本质上还是一个变量, 因此与其相关的操作是 <strong>读和写</strong>, 对应 <strong>getter 和 setter</strong> 方法. 第一个版本的 <code>MyThreadLocal</code> 非常简单, 如下:</p>
+<figure class="highlight java"><figcaption><span>MyThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123; <span class="comment">// !! DON'T DO THIS</span></span><br><span class="line">    <span class="keyword">private</span> T variable;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> variable;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span> <span class="params">(T variable)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.variable = variable;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用泛型语法, 让 <code>MyThreadLocal</code> 可以存放任何类型并且在使用 <code>get</code> 方法时不用强制类型转换.</p>
+<h3 id="MyThreadLocal-V2-using-Map"><a href="#MyThreadLocal-V2-using-Map" class="headerlink" title="MyThreadLocal V2 using Map"></a>MyThreadLocal V2 using Map</h3><p>为了让一个线程都可以拥有该变量的一份副本, 使用 <code>Map</code> 数据结构来存放这种对应关系, 第二个版本的代码如下:</p>
+<figure class="highlight java"><figcaption><span>MyThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123; <span class="comment">// !! DON'T DO THIS</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;Thread, Object&gt; threadLocalMap =</span><br><span class="line">        Collections.synchronizedMap (<span class="keyword">new</span> HashMap&lt;Thread, Object&gt; ());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> T initialValue;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyThreadLocal</span> <span class="params">(T initialValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.initialValue = initialValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Thread currentThread = Thread.currentThread ();</span><br><span class="line">        <span class="keyword">return</span> (T) threadLocalMap.getOrDefault (currentThread, initialValue);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span> <span class="params">(T variable)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Thread currentThread = Thread.currentThread ();</span><br><span class="line">        threadLocalMap.put (currentThread, variable);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li>定义一个类型为 <code>Map</code> 的变量 <code>threadLocalMap</code>, 为了所有线程都共享该变量, 将 <code>threadLocalMap</code> 变量用 <code>static</code> 修饰, 并且使用 <code>Collections.synchronizedMap</code> 方法进行包装, 使其成为线程安全的; 使用新版本的 JDK 可以使用 <code>java.util.concurrent.ConcurrentHashMap</code>;</li>
+<li>由于将 <code>threadLocalMap</code> 使用 <code>static</code> 修饰, 因此泛型参数将无法使用, 使用 <code>Object</code> 来指定 <code>value</code> 类型, 并在返回时进行转换;</li>
+<li>为了让所有线程在第一次获取该变量的副本时拥有相同的初始值, 定义了一个成员变量 <code>initialValue</code>, 并且在构造方法中传入;</li>
+<li>为了获取与当前的线程相关的变量, 调用 <code>Thread.currentThread()</code> 获取当前的线程, 将其作为 <code>key</code> 调用 <code>threadLocalMap</code> 的 <code>getOrDefault</code> 方法, 当当前线程还没有设置过该变量的值时, 返回该变量的初始值, 否则返回该线程最近一次设置该变量的值;</li>
+<li>当调用 <code>set</code> 方法时, 线程的 <code>Thread.currentThread()</code> 返回代表该线程的对象, 并且使用该值作为 <code>key</code> 设置其 <code>value</code> 的值.</li>
+</ul>
+<p>需要注意的是: 以上的 <code>MyThreadLocal</code> 还不能保证在所有情况下都正常工作, 比如下面的代码将达不到预期效果:</p>
+<figure class="highlight java"><figcaption><span>Test.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> StringBuilder          initialValue = <span class="keyword">new</span> StringBuilder ();</span><br><span class="line">    MyThreadLocal&lt;StringBuilder&gt; builder      = <span class="keyword">new</span> MyThreadLocal&lt;StringBuilder&gt; (initialValue);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">new</span> Thread () &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">final</span> StringBuilder append = builder.get ().append (Thread.currentThread ().getName ()).append (<span class="string">" "</span>);</span><br><span class="line">                builder.set (append);</span><br><span class="line">                System.out.println (<span class="string">"String in thread "</span> + Thread.currentThread ().getName () + <span class="string">" is "</span> + builder.get ().toString ());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上代码意图很明显, 在每个线程对应的局部变量 <code>builder</code> 中放入当前线程的名字, 然而最终代码运行其中一种输出却显示如下,  (根据你自己的运行结果可能不完全一样) :</p>
+<figure class="highlight plain"><figcaption><span>output</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String in thread Thread-0 is Thread-0 Thread-1</span><br><span class="line">String in thread Thread-2 is Thread-0 Thread-1 Thread-2</span><br><span class="line">String in thread Thread-1 is Thread-0 Thread-1</span><br><span class="line">String in thread Thread-3 is Thread-0 Thread-1 Thread-2 Thread-3</span><br><span class="line">String in thread Thread-4 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4</span><br><span class="line">String in thread Thread-5 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4 Thread-5</span><br><span class="line">String in thread Thread-6 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4 Thread-5 Thread-6</span><br><span class="line">String in thread Thread-7 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4 Thread-5 Thread-6 Thread-7</span><br><span class="line">String in thread Thread-8 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4 Thread-5 Thread-6 Thread-7 Thread-8</span><br><span class="line">String in thread Thread-9 is Thread-0 Thread-1 Thread-2 Thread-3 Thread-4 Thread-5 Thread-6 Thread-7 Thread-8 Thread-9</span><br></pre></td></tr></table></figure>
+<p>很明显所有的线程都是共享同一个 <code>StringBuilder</code>, 因此该类并不能达到目的. 原因在于对初始值的获取方式错误:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> T initialValue;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyThreadLocal</span> <span class="params">(T initialValue)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.initialValue = initialValue;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@SuppressWarnings</span> (<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">get</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Thread currentThread = Thread.currentThread ();</span><br><span class="line">    <span class="keyword">return</span> (T) threadLocalMap.getOrDefault (currentThread, initialValue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从中可以看出, 当线程调用 <code>get</code> 方法之前没有调用过 <code>set</code> 方法时, 那么所有线程返回默认的初始对象, 该对象也就是构造方法中传入的那个, 都是同一个对象, 当调用完 <code>get</code> 方法后再次调用 <code>set</code> 方法时, 所有的线程就都使用同一个对象了. 因此应该修改初始值的获取方法, 第三个版本的 <code>MyThreadLocal</code> 类如下:</p>
+<figure class="highlight java"><figcaption><span>MyThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;Thread, Object&gt; threadLocalMap = Collections.synchronizedMap (<span class="keyword">new</span> HashMap&lt;Thread, Object&gt; ());</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyThreadLocal</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> T <span class="title">initialValue</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings</span> (<span class="string">"unchecked"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        Thread currentThread = Thread.currentThread ();</span><br><span class="line">        T      value         = (T) threadLocalMap.get (currentThread);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">            value = initialValue ();</span><br><span class="line">            threadLocalMap.put (currentThread, value);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span> <span class="params">(T variable)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Thread currentThread = Thread.currentThread ();</span><br><span class="line">        threadLocalMap.put (currentThread, variable);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<ul>
+<li>去掉构造方法中的初始值参数, 使用一个 <code>protected</code> 的 <code>initialValue</code> 方法, 在 <code>get</code> 方法中如果当前线程没有设置过该变量的值, 就调用 <code>initialValue</code> 方法获取初始值, 并放到 <code>threadLocalMap</code> 中;</li>
+<li>由于 <code>initialValue</code> 方法返回 <strong>当前线程</strong> 对应的该变量的初始值, 因此如果想不同线程都使用不同的对象时, 应该子类化 <code>MyThreadLocal</code> 类并且覆盖 <code>initialValue</code> 方法, 典型的用法是使用匿名内部类, 如下:<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MyThreadLocal&lt;StringBuilder&gt; builder = <span class="keyword">new</span> MyThreadLocal&lt;StringBuilder&gt; ()&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> StringBuilder <span class="title">initialValue</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StringBuilder ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>因此上一个版本的测试代码应该修改如下, 并且可以达到目的:<figure class="highlight java"><figcaption><span>Main.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyThreadLocal&lt;StringBuilder&gt; builder = <span class="keyword">new</span> MyThreadLocal&lt;StringBuilder&gt; ()&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> StringBuilder <span class="title">initialValue</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> StringBuilder ();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread () &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">final</span> StringBuilder append = builder.get ().append (Thread.currentThread ().getName ()).append (<span class="string">" "</span>);</span><br><span class="line">                    builder.set (append);</span><br><span class="line">                    System.out.println (<span class="string">"String in thread "</span> + Thread.currentThread ().getName () + <span class="string">" is "</span> + builder.get ().toString ());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;.start ();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  输出结果为:<figure class="highlight plain"><figcaption><span>output</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String in thread Thread-1 is Thread-1</span><br><span class="line">String in thread Thread-0 is Thread-0</span><br><span class="line">String in thread Thread-2 is Thread-2</span><br><span class="line">String in thread Thread-3 is Thread-3</span><br><span class="line">String in thread Thread-4 is Thread-4</span><br><span class="line">String in thread Thread-5 is Thread-5</span><br><span class="line">String in thread Thread-6 is Thread-6</span><br><span class="line">String in thread Thread-7 is Thread-7</span><br><span class="line">String in thread Thread-8 is Thread-8</span><br><span class="line">String in thread Thread-9 is Thread-9</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="Using-ThreadLocal"><a href="#Using-ThreadLocal" class="headerlink" title="Using ThreadLocal"></a>Using ThreadLocal</h2><p>对于 <code>ThreadLocal</code> 的使用有一个很容易陷入的误区, 就是很多人会认为 <code>ThreadLocal</code> 是用来解决线程同步的, 也就是说如果一个类是线程不安全的, 那么使用 <code>ThreadLocal</code> 包装起来它就成了线程安全的. 这种想法实际上错的.</p>
+<p><code>ThreadLocal</code> 为每一个线程提供一个变量的副本, 因此 <code>ThreadLocal</code> 实际解决的是变量的隔离访问, 也就是说把多个线程对同一个变量的访问隔离开来, 这就是通过为每一个线程提供一个私有的变量副本达到的. 为了理解线程同步和 <code>ThreadLocal</code> 提供的隔离访问, 考虑以下代码 (你可能在搜索 <code>ThreadLocal</code> 用法时多次见到这个例子) :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateParser</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SimpleDateFormat parser = <span class="keyword">new</span> SimpleDateFormat (<span class="string">"yyyy-MM-dd"</span>);</span><br><span class="line">        System.out.println (<span class="string">"Today is "</span> + parser.format (<span class="keyword">new</span> Date ()));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> finalI = i;</span><br><span class="line">            <span class="keyword">new</span> Thread (() -&gt; &#123;</span><br><span class="line">                System.out.println (<span class="string">"Thread "</span> + Thread.currentThread ()</span><br><span class="line">                                                      .getName () + <span class="string">" parse result is "</span> +</span><br><span class="line">                                            parser.format (<span class="keyword">new</span> Date (System.currentTimeMillis () + finalI * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>)));</span><br><span class="line">            &#125;).start ();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码的目的是创建 10 个线程, 线程 i 输出当前日期加 i 天后的日期并格式化输出, 但是其中一种输出结果是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Today is 2016-03-04</span><br><span class="line">Thread Thread-0 parse result is 2016-03-04</span><br><span class="line">Thread Thread-1 parse result is 2016-03-05</span><br><span class="line">Thread Thread-2 parse result is 2016-03-07</span><br><span class="line">Thread Thread-3 parse result is 2016-03-07</span><br><span class="line">Thread Thread-4 parse result is 2016-03-08</span><br><span class="line">Thread Thread-5 parse result is 2016-03-09</span><br><span class="line">Thread Thread-6 parse result is 2016-03-10</span><br><span class="line">Thread Thread-7 parse result is 2016-03-11</span><br><span class="line">Thread Thread-8 parse result is 2016-03-12</span><br><span class="line">Thread Thread-9 parse result is 2016-03-13</span><br></pre></td></tr></table></figure>
+<p>可见在线程 2 和线程 3 输出错误, 原因是 <code>SimpleDateFormat</code> 是线程不安全的, 因此解决办法就是让每一个线程都拥有 <code>parser</code> 变量的一个副本, 各不相关. 代码如下:</p>
+<figure class="highlight java"><figcaption><span>DateParser.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateParser</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ThreadLocal&lt;SimpleDateFormat&gt; parser = <span class="keyword">new</span> ThreadLocal&lt;SimpleDateFormat&gt; () &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> SimpleDateFormat <span class="title">initialValue</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat (<span class="string">"yyyy-MM-dd"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        System.out.println (<span class="string">"Today is "</span> + parser.get ().format (<span class="keyword">new</span> Date ()));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> finalI = i;</span><br><span class="line">            <span class="keyword">new</span> Thread (() -&gt; &#123;</span><br><span class="line">                System.out.println (<span class="string">"Thread "</span> + Thread.currentThread ()</span><br><span class="line">                                                      .getName () + <span class="string">" parse result is "</span> +</span><br><span class="line">                                            parser.get ().format (<span class="keyword">new</span> Date (System.currentTimeMillis () + finalI * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>)));</span><br><span class="line">            &#125;).start ();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面代码可以看出, 最终每一个线程所拥有的 <code>SimpleDateFormat</code> 对象都不相同, 而如果使用同步化机制的话每个线程使用的 <code>SimpleDateFormat</code> 应该都是相同的, 例如:</p>
+<figure class="highlight java"><figcaption><span>DateParser.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DateParser</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> SimpleDateFormat format = <span class="keyword">new</span> SimpleDateFormat (<span class="string">"yyyy-MM-dd"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> DateParser parser = <span class="keyword">new</span> DateParser ();</span><br><span class="line">        System.out.println (<span class="string">"Today is "</span> + parser.format (<span class="keyword">new</span> Date ()));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> finalI = i;</span><br><span class="line">            <span class="keyword">new</span> Thread (() -&gt; &#123;</span><br><span class="line">                System.out.println (<span class="string">"Thread "</span> + Thread.currentThread ()</span><br><span class="line">                                                      .getName () + <span class="string">" parse result is "</span> +</span><br><span class="line">                                            parser.format (<span class="keyword">new</span> Date (System.currentTimeMillis () + finalI * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>)));</span><br><span class="line">            &#125;).start ();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> String <span class="title">format</span> <span class="params">(Date date)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> format.format (date);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于 <code>SimpleDateFormat</code> 消耗内存资源很多, 为了节约资源, 将其设置为成员变量, 让每一个线程都调用 <code>DateParser</code> 的 <code>format</code> 方法, 并且对该方法同步化 (使用 <code>synchronized</code> 关键字修饰) , 因此所有线程使用的都是同一个对象. 虽然该方法节约内存, 但是同步化却耗费了时间, 是一个典型的时空权衡问题 (space-time trade off) .</p>
+<h2 id="Initializing-in-Java-8"><a href="#Initializing-in-Java-8" class="headerlink" title="Initializing in Java 8"></a>Initializing in Java 8</h2><p>在最新 JDK 中, 关于 <code>ThreadLocal</code> 类的初始化方法除了上面的写法之外, 还增加了 <code>withInitial</code> 静态方法, 可以使用 lambda 表达式和该静态方法简写上面匿名内部类的的写法. 如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ThreadLocal&lt;StringBuilder&gt; threadLocal = ThreadLocal.withInitial (StringBuilder::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Lifecycle-of-Variables"><span class="toc-number">1.</span> <span class="toc-text">Lifecycle of Variables</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Static-Variables"><span class="toc-number">1.1.</span> <span class="toc-text">Static Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Member-Variables"><span class="toc-number">1.2.</span> <span class="toc-text">Member Variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local-Variables"><span class="toc-number">1.3.</span> <span class="toc-text">Local Variables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal"><span class="toc-number">2.</span> <span class="toc-text">ThreadLocal</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MyThreadLocal"><span class="toc-number">3.</span> <span class="toc-text">MyThreadLocal</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MyThreadLocal-V1"><span class="toc-number">3.1.</span> <span class="toc-text">MyThreadLocal V1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MyThreadLocal-V2-using-Map"><span class="toc-number">3.2.</span> <span class="toc-text">MyThreadLocal V2 using Map</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-ThreadLocal"><span class="toc-number">4.</span> <span class="toc-text">Using ThreadLocal</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Initializing-in-Java-8"><span class="toc-number">5.</span> <span class="toc-text">Initializing in Java 8</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&text=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&is_video=false&description=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java - ThreadLocal 详解&body=Check out this article: http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&title=Java - ThreadLocal 详解" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2016/03/03/Java-ThreadLocal/&name=Java - ThreadLocal 详解&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

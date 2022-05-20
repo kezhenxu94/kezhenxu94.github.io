@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="ProblemEnumSet is a specialized implementation of java.util.Set, as its name implies, it is designed for use with Enums; so what’s the difference between EnumSet and a regular Set (say HashSet)? And w">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EnumSet - 特殊的 Set">
+<meta property="og:url" content="http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="ProblemEnumSet is a specialized implementation of java.util.Set, as its name implies, it is designed for use with Enums; so what’s the difference between EnumSet and a regular Set (say HashSet)? And w">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-04-12T08:15:00.000Z">
+<meta property="article:modified_time" content="2018-04-12T08:15:00.000Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Java Collection">
+<meta property="article:tag" content="Enum">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>EnumSet - 特殊的 Set</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/04/21/BitSet-Not-a-Set/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/04/11/Java-java-lang-Object-wait/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&text=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&is_video=false&description=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=EnumSet - 特殊的 Set&body=Check out this article: http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&name=EnumSet - 特殊的 Set&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Problem"><span class="toc-number">1.</span> <span class="toc-text">Problem</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-number">2.</span> <span class="toc-text">Prerequisites</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-EnumSet-Works"><span class="toc-number">3.</span> <span class="toc-text">How EnumSet Works</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Differences"><span class="toc-number">4.</span> <span class="toc-text">Differences</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Performance"><span class="toc-number">4.1.</span> <span class="toc-text">Performance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nullability"><span class="toc-number">4.2.</span> <span class="toc-text">Nullability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency"><span class="toc-number">4.3.</span> <span class="toc-text">Consistency</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        EnumSet - 特殊的 Set
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-04-12T08:15:00.000Z" itemprop="datePublished">2018-04-12</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Enum/" rel="tag">Enum</a>, <a class="tag-link" href="/tags/Java/" rel="tag">Java</a>, <a class="tag-link" href="/tags/Java-Collection/" rel="tag">Java Collection</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="Problem"><a href="#Problem" class="headerlink" title="Problem"></a>Problem</h2><p><code>EnumSet</code> is a specialized implementation of <code>java.util.Set</code>, as its name implies, it is designed for use with <code>Enum</code>s; so what’s the difference between <code>EnumSet</code> and a regular <code>Set</code> (say <code>HashSet</code>)? And why should we use <code>EnumSet</code> whenever possible instead of a regular <code>Set</code>?</p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><p>Here are the environments used in this post:</p>
+<ul>
+<li><p>OS: macOS High Sierra</p>
+</li>
+<li><p>JDK: 1.8.0_151</p>
+</li>
+</ul>
+<h2 id="How-EnumSet-Works"><a href="#How-EnumSet-Works" class="headerlink" title="How EnumSet Works"></a>How <code>EnumSet</code> Works</h2><p>If you look up the source code of <code>EnumSet</code>, it is easy to find out that <code>EnumSet</code> doesn’t store all the elements in a table (like <code>HashMap</code> does), instead, it stores the elements as some bits of a <code>long</code> type field; </p>
+<p>Here is how <code>EnumSet</code> works:</p>
+<p>The only way to create a <code>EnumSet</code> is by calling its static methods:</p>
+<ul>
+<li><code>noneOf(Class&lt;E&gt; elementType)</code>: create a empty <code>EnumSet</code> associated to the enum type <code>elementType</code>;</li>
+<li><code>allOf(Class&lt;E&gt; elementType)</code>: create a <code>EnumSet</code> associated to the enum type <code>elementType</code>, containing all values of Enum <code>E</code>;</li>
+<li><code>copyOf(EnumSet&lt;E&gt; s)</code>: create a <code>EnumSet</code> by copying from another <code>EnumSet</code> s;</li>
+</ul>
+<p>Once created, the <code>EnumSet</code> is associated to a <code>Enum</code> type, whose values are limited and known, and <code>EnumSet</code> maps each of the values to a bit of a <code>long</code> type field, if the value is present in this set, the corresponding bit is set to 1, otherwise 0; in this case:</p>
+<ul>
+<li>Adding an (known) element to this set means setting the corresponding bit to 1;</li>
+<li>Removing an element from this set means setting the corresponding bit to 0;</li>
+<li>Determining whether an element appears in this set (the <code>contains</code> method) means determining the corresponding bit is 1 or 0;</li>
+</ul>
+<p>Depending on how many values of the associated <code>Enum</code> type, <code>EnumSet</code> may store the elements in a single <code>long</code> type field, or a <code>long[]</code> type one because of the fact that a <code>long</code> type in Java occupies 64 bits; </p>
+<p>There are two implementations in <code>EnumSet</code> according to the number of the values of the associated <code>Enum</code> type: <code>RegularEnumSet</code> and <code>JumboEnumSet</code>; <code>RegularEnumSet</code> uses a single <code>long</code> type field to hold the elements’ corresponding bits while <code>JumboEnumSet</code> uses a <code>long[]</code> type field;</p>
+<figure class="highlight java"><figcaption><span>java.util.EnumSet </span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;E extends Enum&lt;E&gt;&gt; <span class="function">EnumSet&lt;E&gt; <span class="title">noneOf</span><span class="params">(Class&lt;E&gt; elementType)</span> </span>&#123;</span><br><span class="line">    Enum&lt;?&gt;[] universe = getUniverse(elementType);</span><br><span class="line">    <span class="keyword">if</span> (universe == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ClassCastException(elementType + <span class="string">" not an enum"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (universe.length &lt;= <span class="number">64</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RegularEnumSet&lt;&gt;(elementType, universe);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> JumboEnumSet&lt;&gt;(elementType, universe);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Differences"><a href="#Differences" class="headerlink" title="Differences"></a>Differences</h2><h3 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h3><p>Since <code>EnumSet</code> is implemented with bitwise operations, all basic operations execute in constant time and thus, are likely to be much faster then their <code>HashSet</code> counterparts;</p>
+<h3 id="Nullability"><a href="#Nullability" class="headerlink" title="Nullability"></a>Nullability</h3><p>Attempts to insert <code>null</code> into <code>EnumSet</code> will cause a <code>NullPointerException</code>, while testing for the presence of <code>null</code> or removing <code>null</code> will function properly, and <code>HashSet</code> permits <code>null</code> element;</p>
+<h3 id="Consistency"><a href="#Consistency" class="headerlink" title="Consistency"></a>Consistency</h3><p><code>EnumSet</code> will never throw <code>ConcurrentModificationException</code> even if you remove some elements simultaneously while iterating it, and if you do this, whether the modifications are visible during the iteration is not defined;</p>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Problem"><span class="toc-number">1.</span> <span class="toc-text">Problem</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Prerequisites"><span class="toc-number">2.</span> <span class="toc-text">Prerequisites</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-EnumSet-Works"><span class="toc-number">3.</span> <span class="toc-text">How EnumSet Works</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Differences"><span class="toc-number">4.</span> <span class="toc-text">Differences</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Performance"><span class="toc-number">4.1.</span> <span class="toc-text">Performance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nullability"><span class="toc-number">4.2.</span> <span class="toc-text">Nullability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency"><span class="toc-number">4.3.</span> <span class="toc-text">Consistency</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&text=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&is_video=false&description=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=EnumSet - 特殊的 Set&body=Check out this article: http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&title=EnumSet - 特殊的 Set" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/04/12/EnumSet-A-Special-Set/&name=EnumSet - 特殊的 Set&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

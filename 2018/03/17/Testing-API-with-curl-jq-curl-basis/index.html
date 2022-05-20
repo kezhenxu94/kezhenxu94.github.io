@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="theme-color" content="#1d1f21" />
+    <meta name="description" content="本文使用的所有示例接口都来自 github 的公开接口, 对此表示感谢  curl 基本用法 使用 man curl 查看 curl 命令的完整手册  使用 curl 调用接口1$ curl &#39;https:&#x2F;&#x2F;api.github.com&#x2F;users&#x2F;github&#x2F;repos&#39; 尽管这里的接口 ‘https:&#x2F;&#x2F;api.github.com&#x2F;users&#x2F;github&#x2F;repos&#39; 两侧的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 &#96;curl&#96; 和 &#96;jq&#96; 测试 RESTful API - &#96;curl&#96; 基础">
+<meta property="og:url" content="http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/index.html">
+<meta property="og:site_name" content="Kids the Programmer">
+<meta property="og:description" content="本文使用的所有示例接口都来自 github 的公开接口, 对此表示感谢  curl 基本用法 使用 man curl 查看 curl 命令的完整手册  使用 curl 调用接口1$ curl &#39;https:&#x2F;&#x2F;api.github.com&#x2F;users&#x2F;github&#x2F;repos&#39; 尽管这里的接口 ‘https:&#x2F;&#x2F;api.github.com&#x2F;users&#x2F;github&#x2F;repos&#39; 两侧的">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-03-17T15:22:13.000Z">
+<meta property="article:modified_time" content="2022-05-20T08:44:58.449Z">
+<meta property="article:author" content="kezhenxu94">
+<meta property="article:tag" content="CLI">
+<meta property="article:tag" content="Productivity">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=16">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=192" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="https://www.gravatar.com/avatar/a14e62dda940324d878be1499c064432?s=180">
+          
+        
+    
+    <!-- title -->
+    <title>使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" class="active"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2018/03/18/Testing-API-with-curl-jq-jq-basis/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2018/03/17/Testing-API-with-curl-jq-Start/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&text=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&is_video=false&description=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础&body=Check out this article: http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&name=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#curl-基本用法"><span class="toc-number">1.</span> <span class="toc-text">curl 基本用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-调用接口"><span class="toc-number">1.1.</span> <span class="toc-text">使用 curl 调用接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-下载文件"><span class="toc-number">1.2.</span> <span class="toc-text">使用 curl 下载文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-传递参数"><span class="toc-number">1.3.</span> <span class="toc-text">使用 curl 传递参数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#GET-参数"><span class="toc-number">1.3.1.</span> <span class="toc-text">GET 参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POST-参数"><span class="toc-number">1.3.2.</span> <span class="toc-text">POST 参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Header-头部参数"><span class="toc-number">1.3.3.</span> <span class="toc-text">Header - 头部参数</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Kids the Programmer</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2018-03-17T15:22:13.000Z" itemprop="datePublished">2018-03-17</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/CLI/" rel="tag">CLI</a>, <a class="tag-link" href="/tags/Productivity/" rel="tag">Productivity</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <blockquote>
+<p>本文使用的所有示例接口都来自 <a href="https://developer.github.com/v3/" target="_blank" rel="noopener">github 的公开接口</a>, 对此表示感谢</p>
+</blockquote>
+<h2 id="curl-基本用法"><a href="#curl-基本用法" class="headerlink" title="curl 基本用法"></a><code>curl</code> 基本用法</h2><blockquote>
+<p>使用 <code>man curl</code> 查看 <code>curl</code> 命令的完整手册</p>
+</blockquote>
+<h3 id="使用-curl-调用接口"><a href="#使用-curl-调用接口" class="headerlink" title="使用 curl 调用接口"></a>使用 <code>curl</code> 调用接口</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl <span class="string">'https://api.github.com/users/github/repos'</span></span></span><br></pre></td></tr></table></figure>
+<p>尽管这里的接口 ‘<a href="https://api.github.com/users/github/repos&#39;" target="_blank" rel="noopener">https://api.github.com/users/github/repos&#39;</a> 两侧的单引号不是必须的, 但是始终使用单引号将接口地址包围起来是一个好的习惯, 因为当接口需要多个参数时, 其中包含的 <code>&amp;</code> 符号在 <code>shell</code> 中有特殊的含义, 可能导致结果与预期的不符;</p>
+<h3 id="使用-curl-下载文件"><a href="#使用-curl-下载文件" class="headerlink" title="使用 curl 下载文件"></a>使用 <code>curl</code> 下载文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl <span class="string">'https://api.github.com/users/github/repos'</span> -O</span></span><br></pre></td></tr></table></figure>
+<p>其中 <code>-O</code> (大写字母 O) 参数表示将该 URL 地址的返回存放到当前目录的文件中, 文件名是 URL 的最后一个 Path Segment (即最后一个/之后的所有内容), 此处为 <code>repos</code>, 如果想将返回结果存放到自定义的文件中, 可以使用 <code>-o</code> (小写字母 o) 再加文件名;</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl <span class="string">'https://api.github.com/users/github/repos'</span> -o /tmp/repos.json</span></span><br></pre></td></tr></table></figure>
+<p>以上命令将接口的返回内容存放到 <code>/tmp/repos.json</code> 文件中;</p>
+<p>有时候在服务上需要下载一些工具的压缩包, 如 <code>jmeter</code>, <code>maven</code>, <code>ant</code>, <code>gradle</code> 等, 可以先在本地电脑上找到下载的链接, 再在服务器上使用 <code>curl</code> 命令下载文件, 如下载 <code>jmeter</code>:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> /tmp/</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> curl <span class="string">'http://mirrors.hust.edu.cn/apache/jmeter/binaries/apache-jmeter-4.0.zip'</span> -O</span></span><br></pre></td></tr></table></figure>
+<p>以上命令将 <code>jmeter</code> 的二进制安装程序的压缩包下载到 <code>/tmp/apache-jmeter-4.0.zip</code> 文件中.</p>
+<h3 id="使用-curl-传递参数"><a href="#使用-curl-传递参数" class="headerlink" title="使用 curl 传递参数"></a>使用 <code>curl</code> 传递参数</h3><p>默认 <code>curl</code> 命令会对后面所跟随的 URL 地址使用 <code>HTTP GET</code> 请求, <code>curl</code> 命令支持 <code>HTTP</code> 协议中诸如 <code>GET</code>, <code>POST</code>, <code>HEAD</code>, <code>DELETE</code> 等方法, 使用 <code>-X</code> 后跟随方法名对 URL 地址使用指定的 <code>HTTP</code> 方法, 如 <code>-XGET</code> 与默认行为一致, <code>-XPOST</code> 使用 <code>POST</code> 方法请求接口地址;</p>
+<h4 id="GET-参数"><a href="#GET-参数" class="headerlink" title="GET 参数"></a><code>GET</code> 参数</h4><p>当使用 <code>GET</code> 方法时, 请求参数 (Query String) 为 URL 的一部分, 可以直接写在 URL 中, 如:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XGET <span class="string">'https://api.github.com/users/github/repos?type=owner'</span></span></span><br></pre></td></tr></table></figure>
+<p>但当请求参数不为纯 ASCII 字符的时候, 需要使用 <code>-G</code> 参数进行传递, 如:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XGET <span class="string">'https://api.github.com/search/repositories?q=极客'</span></span></span><br></pre></td></tr></table></figure>
+<p>会返回一个错误的 html 页面 (而不是 json ), 因为其中非 ASCII 字符 “极客” 被 <code>curl</code> 处理后不知道成了什么, 导致 github 说该请求不符合 API 说明文档, 当 Query String 含有非 ASCII 字符时应该使用 <code>-G</code> 进行传递:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XGET <span class="string">'https://api.github.com/search/repositories?sort=stars'</span> -G --data-urlencode <span class="string">'q=极客'</span></span></span><br></pre></td></tr></table></figure>
+<p>如上所示, 如果有多个参数, 只有其中的非 ASCII 字符串需要使用 –data-urlencode 进行传递, 其余的纯 ASCII 参数使用原来的传递方式进行, 纯 ASCII 字符参数当然也可以使用 –data-urlencode 进行传递, 因此上面的请求与以下请求是等价的:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XGET <span class="string">'https://api.github.com/search/repositories'</span> -G --data-urlencode <span class="string">'q=极客'</span> --data-urlencode <span class="string">'sort=stars'</span></span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>NOTE: 如果非 ASCII 字符串被进行 URL 编码了之后为纯 ASCII 字符, 则可以不使用 -G 进行传递, 直接跟在 URL 中</p>
+</blockquote>
+<h4 id="POST-参数"><a href="#POST-参数" class="headerlink" title="POST 参数"></a><code>POST</code> 参数</h4><p>当使用 <code>POST</code> 请求时, <code>POST</code> 请求的参数包括 Query String 以及 Body, 其中 Query String 和上面的 <code>GET</code> 请求参数传递一样, 而要传递 Body 则需要使用 <code>-d</code> 参数:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XPOST <span class="string">'http://example.com/'</span> -d<span class="string">'</span></span></span><br><span class="line">&#123;</span><br><span class="line">    "key1": "value1",</span><br><span class="line">    "key2": "value2"</span><br><span class="line">&#125;'</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>按照 <code>RESTful</code> 风格, <code>POST</code> 请求将会改变服务器的资源, 此处没有找到合适的测试接口, 因此随便使用一个地址</p>
+</blockquote>
+<p>以上 <code>-d</code> 参数紧跟着一个字符串, 用单引号包围, 字符串为一个 <code>json</code> 字符串;</p>
+<p>如果传递的 Body 内容非常长, 输入的时候可能不太方便, 并且在重复测试的时候要重复输入, 非常不方便, 可以先将 Body 数据存放到文件中, <code>-d</code> 参数支持使用文件作为输入, 如文件 /tmp/request-body.json 内容为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"key1"</span>: <span class="string">"value1"</span>,</span><br><span class="line">    <span class="attr">"key2"</span>: <span class="string">"value2"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>则上面的命令与以下命令等价:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl -XPOST <span class="string">'http://example.com/'</span> -d @/tmp/request-body.json</span></span><br></pre></td></tr></table></figure>
+<h4 id="Header-头部参数"><a href="#Header-头部参数" class="headerlink" title="Header - 头部参数"></a><code>Header</code> - 头部参数</h4><p>除了可以对 <code>HTTP</code> 各种请求方法传递参数, <code>curl</code> 也可以在进行请求时设置 <code>HTTP</code> 的请求头, 使用 <code>-H</code> 指定, 如 <code>HTTP</code> <a href="https://en.wikipedia.org/wiki/Basic_access_authentication" target="_blank" rel="noopener">基本验证 (Basic Auth)</a> 要求在请求接口时带上 <code>Authorization</code> 请求头:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> curl <span class="string">'https://api.github.com/user/keys/'</span> -H<span class="string">'Authorization: Basic xxxxx'</span> -H<span class="string">'Referer: www.google.com'</span></span></span><br></pre></td></tr></table></figure>
+<p>其中 <code>/user/keys</code> 接口要求调用时必须使用 <code>Basic Authentication</code>, 因此必须使用 <code>-H</code> 设置请求头, 如上, <code>-H</code> 可以多次使用设置多个请求头, 以上示例还设置了 <code>Referer</code> 请求头;</p>
+<blockquote>
+<p><code>Basic Authentication</code> 也可以使用 <code>curl -u username:password</code> 进行设置, 实际上 <code>Authorization</code> 头部中的 <code>Basic</code> 后面带的一串字符串就是 <code>username:password</code> 的 <code>base64</code> 编码, 如用户名是 Aladdin 密码是 OpenSesame, 而字符串 “Aladdin:OpenSesame” 的 <code>base64</code> 编码为 “QWxhZGRpbjpPcGVuU2VzYW1l”, 那么 <code>Authorization</code> 头部就是 <code>Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l</code>;</p>
+</blockquote>
+
+  </div>
+</article>
+<div id="gitalk-ctn"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script>
+  const gitalk = new Gitalk({
+    id: location.pathname,
+    owner: 'kezhenxu94',
+    admin: 'kezhenxu94',
+    repo: 'kezhenxu94.github.io',
+    clientID: '7857b3ff63637b04eaf4',
+    clientSecret: '613a21312abd5bf0fca945e9687ea764063b14bd',
+  });
+  gitalk.render('gitalk-ctn')
+</script>
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#curl-基本用法"><span class="toc-number">1.</span> <span class="toc-text">curl 基本用法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-调用接口"><span class="toc-number">1.1.</span> <span class="toc-text">使用 curl 调用接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-下载文件"><span class="toc-number">1.2.</span> <span class="toc-text">使用 curl 下载文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用-curl-传递参数"><span class="toc-number">1.3.</span> <span class="toc-text">使用 curl 传递参数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#GET-参数"><span class="toc-number">1.3.1.</span> <span class="toc-text">GET 参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#POST-参数"><span class="toc-number">1.3.2.</span> <span class="toc-text">POST 参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Header-头部参数"><span class="toc-number">1.3.3.</span> <span class="toc-text">Header - 头部参数</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&text=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&is_video=false&description=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础&body=Check out this article: http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&title=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://kezhenxu94.github.io/2018/03/17/Testing-API-with-curl-jq-curl-basis/&name=使用 `curl` 和 `jq` 测试 RESTful API - `curl` 基础&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 kezhenxu94
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/tools/">Tools</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/fontawesome-all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-105799663-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+    <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?2e6da3c375c8a87f5b664cea6d4cb29c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+

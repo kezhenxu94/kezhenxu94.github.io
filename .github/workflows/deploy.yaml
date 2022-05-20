@@ -30,6 +30,9 @@ jobs:
         with:
           submodules: true
           fetch-depth: 1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 12
       - name: Install Hexo
         run: sudo npm i hexo-cli -g && npm i
       - name: Build Dist

@@ -1,0 +1,207 @@
+---
+title: Pipe buffer content to an external command in VIM
+summary: |
+  Working with VIM, there are times when you want to process the content of the buffer with an external command and replace the content with the output of the command. In this post, I will show you how to do it.
+tags: [ vim, tools, tips ]
+date: 2024-11-19
+draft: false
+---
+
+VIMers are mostly also command-line enthusiasts, as the Unix philosophy says:
+
+> Write programs that do one thing and do it well. Write programs to work together.
+
+it's not uncommon that you want to pipe the content in the VIM buffer to external programs and replace the content with the output of the command. In this post I'll demostrate you some of my workflows to pipe buffer content to external command in VIM.
+
+# Pipe buffer content to external command
+
+Consider you have a compacted JSON file with the following content:
+
+```json
+{"slideshow":{"author":"Yours Truly","date":"date of publication","slides":[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}],"title":"Sample Slide Show"}}
+```
+
+> [!TIP]
+> You can get the content by running `:r!curl -s https://httpbin.org/json | jq -c` in your VIM, which is one way to work with external command!
+
+and you want to prettify the JSON content with `jq` and replace the content with the output of the command. You can use the following steps:
+
+1. Make sure you are in normal mode by pressing `Esc`.
+2. Type `:%!jq` to pipe the whole buffer content to `jq`, and replace the current buffer with the output of the command.3. Press `Enter` to execute the command.
+4. Press `Esc` to exit insert mode.
+
+In the step 2, `%` represents the whole buffer content, `!` is a filter command used to pipe the content to an external command, and `jq` is the external command to prettify the JSON content.
+
+Now your JSON content is formatted!
+
+# Pipe selection lines to external command
+
+In the previous example, we have shown how to pipe the whole buffer content to an external command, but what if you want to pipe only a few lines to an external command? The filter command `!` also works with visual mode, you can use the following steps to pipe the selected lines to an external command:
+
+Consider you have the following content in your VIM editor:
+
+```text
+This is a file containing some text, and a few lines of JSON string:
+
+{"slideshow":{"author":"Yours Truly","date":"date of publication","slides":[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}],"title":"Sample Slide Show"}}
+^ cursor here
+
+Here are some more plain texts.
+```
+
+You can use the following steps to select the JSON string and prettify it with `jq`:
+
+1. Press `V` to select the current JSON line and enter visual mode.
+2. Type `:` to enter command mode, and you command line will become `:'<,'>`, meaning the command will be applied to the selected lines.
+3. Type `!jq` to pipe the selected lines to `jq`, and replace the selected lines with the output of the command.
+4. Press `Enter` to execute the command.
+5. Press `Esc` to exit visual mode.
+
+And now your JSON content is formatted!
+
+# Read the output of external command to buffer
+
+In the previous examples, we have shown how to pipe the content of the buffer to an external command, but what if you just want to read the output of an external command to the buffer? For example, you want to insert the current date and time to the buffer. You can use the following steps:
+
+1. Make sure you are in normal mode by pressing `Esc`.
+2. Type `:r!date` to read the output of the `date` command and insert it to the cursor position.
+3. Press `Enter` to execute the command.
+
+# Some more examples
+
+## Base64 decode the content line by line
+
+```text
+SGVsbG8gV29ybGQK
+VGhpcyBpcyBrZXpoZW54dTk0J3MgYmxvZyEK
+V2VsY29tZSEK
+```
+
+You can base64 decode the content line by line with the following steps:
+
+1. Type `g/^/.!base64 -d` to pipe each line to `base64 -d`, and replace the line with the output of the command.
+
+You will get the decoded content!
+
+```text
+Hello World
+This is kezhenxu94's blog!
+Welcome!
+```
+
+The `g` command is use to execute a command on each line that matches a pattern, `^` matches the beginning of the line, this basically means every line, and `.!base64 -d` is the command to decode the line being processed.
+
+## Decoding SkyWalking topology response
+
+In Apache SkyWalking, the nodes in the topology response are base64 encoded, and with a suffix `.0` or `.1`, like the following:
+
+```json
+[
+  {
+    "id": "YWdlbnQ6OnNvbmdz.1-MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0",
+    "source": "YWdlbnQ6OnNvbmdz.1",
+    "detectPoints": [
+      "CLIENT"
+    ],
+    "target": "MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0"
+  },
+  {
+    "id": "YWdlbnQ6OmdhdGV3YXk=.1-YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1",
+    "source": "YWdlbnQ6OmdhdGV3YXk=.1",
+    "detectPoints": [
+      "CLIENT",
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1"
+  },
+  {
+    "id": "YWdlbnQ6OnNvbmdz.1-cHNxbC5za3l3YWxraW5nLXNob3djYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjU0MzI=.0",
+    "source": "YWdlbnQ6OnNvbmdz.1",
+    "detectPoints": [
+      "CLIENT"
+    ],
+    "target": "cHNxbC5za3l3YWxraW5nLXNob3djYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjU0MzI=.0"
+  },
+  {
+    "id": "YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1-YWdlbnQ6OnNvbmdz.1",
+    "source": "YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1",
+    "detectPoints": [
+      "CLIENT",
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OnNvbmdz.1"
+  },
+  {
+    "id": "YWdlbnQ6OmFwcA==.1-YWdlbnQ6OmdhdGV3YXk=.1",
+    "source": "YWdlbnQ6OmFwcA==.1",
+    "detectPoints": [
+      "CLIENT",
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OmdhdGV3YXk=.1"
+  },
+  {
+    "id": "YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1-YWdlbnQ6OnJhdGluZw==.1",
+    "source": "YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1",
+    "detectPoints": [
+      "CLIENT",
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OnJhdGluZw==.1"
+  },
+  {
+    "id": "YWdlbnQ6OmdhdGV3YXk=.1-YWdlbnQ6OnNvbmdz.1",
+    "source": "YWdlbnQ6OmdhdGV3YXk=.1",
+    "detectPoints": [
+      "CLIENT",
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OnNvbmdz.1"
+  },
+  {
+    "id": "MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0-YWdlbnQ6OnNvbmdz.1",
+    "source": "MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0",
+    "detectPoints": [
+      "SERVER"
+    ],
+    "target": "YWdlbnQ6OnNvbmdz.1"
+  }
+]
+```
+
+Take the id `YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1-YWdlbnQ6OnJhdGluZw==.1` as an example, it means the topology is `YWdlbnQ6OnJlY29tbWVuZGF0aW9u -> YWdlbnQ6OnJhdGluZw==`, which is `agent::recommendation -> agent::rating`, and we want to decode the response to human-readable format.
+
+1. First, we will extract the ids from the response, type `:%!jq '.[].id' -r` to extract the ids,
+
+```text
+YWdlbnQ6OnNvbmdz.1-MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0
+YWdlbnQ6OmdhdGV3YXk=.1-YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1
+YWdlbnQ6OnNvbmdz.1-cHNxbC5za3l3YWxraW5nLXNob3djYXNlLnN2Yy5jbHVzdGVyLmxvY2FsOjU0MzI=.0
+YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1-YWdlbnQ6OnNvbmdz.1
+YWdlbnQ6OmFwcA==.1-YWdlbnQ6OmdhdGV3YXk=.1
+YWdlbnQ6OnJlY29tbWVuZGF0aW9u.1-YWdlbnQ6OnJhdGluZw==.1
+YWdlbnQ6OmdhdGV3YXk=.1-YWdlbnQ6OnNvbmdz.1
+MTAuMTAwLjIwMi4xMDA6NjE2MTY=.0-YWdlbnQ6OnNvbmdz.1
+```
+
+2. Now we are going to Base64 decode the two parts splitted by `-` for each line, type `:%s/\(.*\)\.[01]-\(.*\)\.[01]/\=substitute(system('echo '.submatch(1).'| base64 -d').' -> '.system('echo '.submatch(2).'| base64 -d'),'\n', '', 'g')/`
+
+```text
+agent::songs -> 10.100.202.100:61616
+agent::gateway -> agent::recommendation
+agent::songs -> psql.skywalking-showcase.svc.cluster.local:5432
+agent::recommendation -> agent::songs
+agent::app -> agent::gateway
+agent::recommendation -> agent::rating
+agent::gateway -> agent::songs
+10.100.202.100:61616 -> agent::songs
+```
+
+Let's break down the command:
+
+- `:%s/\(.*\)\.[01]-\(.*\)\.[01]/` is the search pattern, we are going to match the two parts splitted by `-` in each line, each `\(.*\)\.[01]` will capture the service name in a group, leaving the suffix `.0` / `.1` out of the group.
+- `\=substitute(system('echo '.submatch(1).'| base64 -d').' -> '.system('echo '.submatch(2).'| base64 -d'),'\n', '', 'g')` is the replacement pattern, we are going to decode the two parts and concatenate them with `->`, and remove the newline character.
+  - `system()` is used to call a system command
+  - `submatch(1)` is used to capture the first matched group, which is the first service name and `submatch(2)` is the second service name
+  - `'echo '.submatch(1).' | base64 -d'` is used to concatenate the command `echo <service name> | base64 -d`
+- The dot (`.`) is used to concatenate strings in VIM command

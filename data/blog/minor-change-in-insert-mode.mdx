@@ -1,0 +1,44 @@
+---
+title: Doing minor changes without leaving insert mode
+summary: |
+  In this post, you will learn how to perform some minor modifications such as inserting new line above/below current line, deleting current line,
+  inserting at the beginning/ending of current line, etc. without leaving insert mode.
+tags: [ vim, tools, tips ]
+date: 2024-11-22
+draft: false
+---
+
+It's a good practice to leave insert mode and enter normal mode as soon as you finish typing something in VIM,
+but sometimes you might want to perform some minor modifications without leaving insert mode, perform the modifications,
+and then immediately return to insert mode.
+
+For example, you have the following text in your buffer:
+
+```text
+This is a note that I want to share
+                                  ^ cursor is here
+```
+
+And you want to add `critical` before the text `note`, here are one of the solution:
+
+1. Press `<Esc>` to leave insert mode
+2. Press `6b` to navigate to the beginning of word `note`
+3. Press `i` to enter insert mode, type `critical`
+4. Press `<Esc>` to leave insert mode
+5. Press `A` to go back to the end of the line and enter insert mode again
+
+You will find that step 4 and 5 are tedious because you have to leave insert mode and re-enter it.
+In VIM, there is a command `<ctrl-o>` that allows you to execute a single normal mode command and return to insert mode.
+With the same example above, the steps would be:
+
+1. Press `<Esc>` to leave insert mode
+2. Navigate to the beginning of word `note` by pressing `6b`
+3. Press `i` to enter insert mode, type `critical`
+4. Press `<ctrl-o>A` to go back to the end of the line and enter insert mode again
+
+`<ctrl-o>` can be used with other normal mode commands as well. Here are some examples:
+
+- `<ctrl-o>O`: insert a new line above current line
+- `<ctrl-o>o`: insert a new line below current line
+- `<ctrl-o>cc`: change the current line
+- `<ctrl-o><ctrl-o>`: go to the previous cursor position and keep in insert mode

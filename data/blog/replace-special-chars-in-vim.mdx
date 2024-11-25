@@ -1,0 +1,84 @@
+---
+title: Changing character case in VIM
+summary: |
+  In this post, you will learn how to change word character case in VIM, you will also learn how to change character case in substitution.
+tags: [ vim, tools, tips ]
+date: 2024-11-24
+draft: false
+---
+
+There are caces when you need to change the case of a word in VIM.
+In this post, you will learn how to do that in various ways, each with its own use case.
+
+## Commands
+
+In VIM, there are commands to change character case:
+
+- `gu` - Change to lowercase.
+- `gU` - Change to uppercase.
+- `g~` - Toggle case.
+
+All the commands can be used in combination with text objects to change the case of a word or a sentence.
+For example, `guaw` will change the case of the word under the cursor to lowercase, `g~ap` will toggle
+the case of the paragraph under the cursor.
+The commands can also be used with selections, for example, `gu` will change the case of the selected text to lowercase,
+`gU` will change the case of the selected text to uppercase, and `g~` will toggle the case of the selected text.
+
+### Examples
+
+Consider you have the following text in your VIM editor:
+
+```text
+this is an important text that needs to be capitalized.
+                                                      ^ cursor position
+```
+
+And you want to change the case of the word `important` to uppercase. Here are some ways to do that:
+
+1. Type `3Fi` to move the cursor back to the beginning of the word `important`.
+2. Type `gUiw` to change the word to uppercase.
+3. Press `ESC` to exit insert mode.
+
+After performing the above steps, the text will look like this:
+
+```text
+this is an IMPORTANT text that needs to be capitalized.
+```
+
+## substitution
+
+Changing character case with commands can be handy, but sometimes you might want to change the character case
+by searching patterns and replacing them with the desired case. Changing character case can be also done in the `:s` command.
+
+The following are some replacement examples of changing character case in substitution:
+
+- `\U` - uppercase everything after this until the end of the pattern.
+- `\L` - lowercase everything after this until the end of the pattern.
+- `\u` - uppercase the next character.
+- `\l` - lowercase the next character.
+- `\e` or `\E` - end the case change.
+
+### Examples
+
+Consider you have the following text in your VIM editor:
+
+```text
+this is an important text that needs to be capitalized.
+^ cursor position
+```
+
+And you want to capitalized each word in the text. Here are some ways to do that:
+
+1. Type `:s/\w\+/\u&/g` to capitalize each word in the text.
+2. Press `Enter` to execute the command.
+3. Press `ESC` to exit insert mode.
+
+After performing the above steps, the text will look like this:
+
+```text
+This Is An Important Text That Needs To Be Capitalized.
+```
+
+In the command, `\w\+` matches one or more word characters,
+`&` is the matched pattern, and `\u&` capitalizes the matched pattern,
+`g` is used to replace all occurrences in the line.

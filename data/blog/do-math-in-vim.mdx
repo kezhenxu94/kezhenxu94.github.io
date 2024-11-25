@@ -1,0 +1,60 @@
+---
+title: Doing math calculation in VIM
+summary: |
+  In this post, you will learn how to use the expression register to evaluate a mathematical expresion and insert the result in vim, you will also learn how to use expression register in combination with other registers to evaluate a long expression
+tags: [ vim, tools, tips ]
+date: 2024-11-25
+draft: false
+---
+
+In vim, there is a register called `=` which can be used to evaluate an expression.
+In this post, I will show you how to select an expression and calculate the result and insert the result in VIM.
+
+Consider you have the following expression in your VIM editor:
+
+```text
+Q: We have 3 apples and 4 oranges, how many fruits do we have in total?
+A: 3 + 4 = 
+          ^ cursor here
+```
+
+You can use the following steps to calculate the result and insert it after the `=`:
+
+1. Make sure you are in insert mode by pressing `a`.
+2. Press `ctrl + r` followed by `=` to use the expression register.
+3. Now type the expression `3 + 4` and press `Enter`.
+4. The result `7` will be inserted after the `=`.
+5. Press `Esc` to exit insert mode.
+
+After the above steps, the text will become:
+
+```text
+Q: We have 3 apples and 4 oranges, how many fruits do we have in total?
+A: 3 + 4 = 7
+           ^ cursor here
+```
+
+But wait, what if you have a long expression that you want to calculate, you don't want to type the whole expression again!
+You can use the registers to store the expression and use it later in command mode. Consider you have the following expression:
+
+```text
+I have a long expression, 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = 
+                                                          ^ cursor here
+```
+
+You can use the following steps to calculate the result and insert it after the `=`:
+
+1. Type `F3` to go to the beginning of the expression.
+2. Type `yt=` to yank till the `=`.
+3. Now press `A` to go to the end of the line and enter insert mode.
+4. Press `ctrl + r` followed by `=` to use the expression register.
+5. Press `ctrl + r` followed by `"` to paste the yanked text.
+6. Press `Enter` to calculate the result and insert it at the cursor position.
+7. Press `Esc` to exit insert mode.
+
+After the above steps, the text will become:
+
+```text
+I have a long expression, 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = 52
+                                                            ^ cursor here
+```

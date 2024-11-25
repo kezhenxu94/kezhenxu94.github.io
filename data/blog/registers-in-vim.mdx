@@ -1,0 +1,110 @@
+---
+title: VIM registers explained, usages and examples
+summary: |
+  In this post, I will explain all registers in VIM, what they are, how to use them, and provide some examples to help you understand them better, and use them in your daily VIM workflow
+tags: [ vim, tools, tips ]
+date: 2024-12-04
+draft: false
+---
+
+Registers are one of the most unique and powerful features in VIM, they are used to store text, numbers, commands, and even macros, and can be used to paste the stored content in different ways. In this post, I'll list all registers in VIM and explain what they are, how to use them, and provide some examples to help you understand them better, and use them in your daily VIM workflow.
+
+# Registers
+
+## Unnamed register (`""`)
+
+Unnamed register is the mostly used register in VIM, even if you don't know it, you are using it every day. It is used to store the text that you yanked (`y`, `Y`), deleted (`d`, `D`, `x`, `X`), or changed (`c`, `C`, `s`, `S`), and can be pasted by pressing `p` or `P`.
+
+## Numbered registers (`"0` to `"9`)
+
+- Register `0` always contains the most recent text that you yanked unless you specified another register (`"x`), it is useful when you want to paste the text that you yanked.
+- Register `1` to `9`: register `1` contains the most recent text that you deleted or changed, even when you specified another register, unless the text is less than one line **and** the delete operation is not made with the movement commands: `%`, `(`, `)`, `` ` ``, `/`, `?`, `n`, `N`, `{`, and `}`. With each new deletion or change afterwards, register `2` to `9` are used, the previous deleted or changed text is moved to register `2`, and the previous content of register `2` is moved to register `3`, and so on, up to register `9`, overriding the previous content of register `9`.
+
+> [!TIP]
+> `"0` is for yanked text, `"1` to `"9` are for deleted or changed multiline texts and deleted or changed searched texts.
+
+## Small delete register (`"-`)
+
+This register stores text from commands that delete or change less than one line unless the command specified another register.
+
+The following examples will put the deleted text or changed text in the small delete register:
+
+```vim
+diw
+c4w
+```
+
+## Named registers (`"a` to `"z` and `"A` to `"Z`)
+
+VIM uses these registers only when you explicitly specify them, they are useful when you want to store text in a specific register to use it later.
+
+Specify the register as lowercase in commands to replace the content of the register, and as uppercase to append the content of the register.
+
+### Example Usage
+
+- `"add`: delete the current line and store it in register `a`.
+- `"Add`: delete the current line and append it to register `a`.
+- `"byy`: yank the current line and store it in register `b`.
+
+## Read-only registers (`".`, `":` and `"%`)
+
+- `".` register contains the last inserted text, it is read-only and can't be changed.
+- `":` register contains the last executed command, it is read-only and can't be changed.
+> [!TIP]
+> `:` starts the command mode, which helps you remember that `":` register contains the last executed command.
+- `"%` register contains the current file name, it is read-only and can't be changed.
+> [!TIP]
+> `%` indicates the current file name in the command mode too, you can run `:echo %` to see the current file name, run `:%s` to replace in the whole file, or run `:%!` to filter the whole file through an external command.
+
+## Alternate file register `"#`
+
+`"#` register contains the name of the alternate file for the current window, this is how the `<c-^>` command works and the content of `"#` register impacts how `<c-^>` works. This register is writable, allowing for restoring it after you changed it.
+
+## Expression register `"=`
+
+Unlike other registers, the expression register is not used to store texts, instead, it is used to evaluate an expression and insert the result, it is useful when you want to do some calculations in VIM.
+
+You can use the expression register in the following ways:
+
+- In insert mode, press `<ctrl-r>` followed by `=`, then type the expression and press `Enter` to insert the result;
+- In normal mode, press `"=`, then type the expression and press `Enter` to put the result in the unnamed register, then you can paste the result with `p`.
+
+Read the post [Doing math calculation in VIM](/blog/do-math-in-vim) for more examples.
+
+## Black hole register `"_`
+
+This is a special register that acts similar to `/dev/null` in Unix, it can be used to delete text without affecting the contents of other registers.
+
+### Example Usage
+
+When you copy some text (`the text I copied`) into the unnamed register and want to use it in many other places, later you delete some other text (`this is what I want to removed`) and press `p`, expecting to paste the copied text (`the text I copied`), you will paste the deleted text (`this is what I want to removed`) instead, to avoid this, you can delete the text with the black hole register (`"_d`), then paste the copied text.
+
+> [!TIP]
+> You can also visual select the text that you want to replace, and paste it with `P` (capital `p`) to replace the selected text, without affecting the unnamed register.
+
+## Last search pattern register `"/`
+
+Register `"/` contains the most recent search pattern, this is used for the `n` and `N` commands to repeat the search in the forward and backward directions. You can modify this register with `:let @/ = "new pattern"` without doing actual search.
+
+> [!TIP]
+> `/` starts the search in VIM, which helps you remember that `"/` register contains the last search pattern.
+
+# Display Register Content
+
+We can display the content of a register `x` by running `:reg x`, or display multiple registers by running `:reg x y z`, or display the content of all registers by running `:reg`.
+
+### Example Usage
+
+```vim
+:reg a
+:reg a b c
+:reg
+```
+
+# Modify registers
+
+We can modify the content of a register `x` by assigning a value to it, for example, `:let @x = "new value"`. We can also append to a register `x` by running `:let @x .= "new value"`. If you want to append content to a named register, you can assign the value to the register with uppercase, for example, `:let @X = "appended value"`.
+
+## Example Usage
+
+Recorded macros are also stored in registers, when you press `qa` to start recording a macro in register `a`, you can run `:reg a` to see the content of register `a`, and you can press `"ap` to paste the recorded content in a buffer, edit it and yank it, then use `:let @a = <paste>` to modify the macro without recording it from scratch.

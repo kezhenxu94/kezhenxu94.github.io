@@ -1,0 +1,23 @@
+image:
+  repository: kezhenxu94/nginx-ssl-example
+  pullPolicy: IfNotPresent
+  tag: 1.0.0
+
+replicas: 1
+resources:
+  cpu: 1
+  memory: 500Mi
+
+envs:
+
+gateway:
+  issuer:
+    email: info@kezhenxu94.me
+  hosts: &hosts
+    - letsencrypt.kezhenxu94.me
+  selector:
+    istio: ingressgateway
+  http:
+    hosts: *hosts
+  https:
+    hosts: *hosts

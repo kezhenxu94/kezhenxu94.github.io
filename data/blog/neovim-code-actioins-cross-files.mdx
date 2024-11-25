@@ -1,0 +1,113 @@
+---
+title: Perform code actions cross files in NeoVim
+summary: |
+  Using NeoVim as my PDE has been a great experience, it does not only help in programming my projects, but also help in programming the IDE itself. In this post, I'll show you how to perform code actions across many files in NeoVim, which is very hard, if not impossible, to do in other IDEs.
+tags: [ vim, neovim, tools, tips, ide ]
+date: 2024-11-17
+draft: false
+---
+
+In this post, I'll take an example of the project I'm working on, which is [the Apache SkyWalking](https://github.com/apache/skywalking) project, but don't worry if you're not familiar with it, we will not dive into the project itself, but rather how to do code refactorings in NeoVim.
+
+In [a recent pull request](https://github.com/apache/skywalking/pull/12782/files) I worked on, what I needed to do was to add a Java annotation `@ElasticSearch.EnableDocValues` to some fields cross many Java classes, you can preview the changes [here](https://github.com/apache/skywalking/pull/12782/files).
+
+Now, I have summarized which fields I need to add the annotation to, which are:
+
+1. Fields with another Java annotation `@Column(name = ...)`
+2. I only need to add `@ElasticSearch.EnableDocValues` to the fields whose `name` value in `@Column(name = ...)` are the following values:
+  - `COMPONENT_ID`
+  - `COMPONENT_IDS`
+  - `TIMESTAMP`
+  - `START_TIME`
+  - `ENTITY_ID`
+  - `TAG_KEY`
+  - `LATENCY`
+  - `START_TIME_SECOND`
+  - `START_TIME_NANOS`
+  - `VALUE`
+  - `TIME_BUCKET`
+  - `PERCENTAGE`
+  - `OPERATION_TIME`
+  - `CREATE_TIME`
+  - `OPERATION_TIME`
+  - `DUMP_TIME`
+  - `SEQUENCE`
+  - `TRACE_ID`
+  - `TIMESTAMP_MILLIS`
+
+Now here is how I did it.
+
+## Populate the quickfix list that need to be modified
+
+The first step is to populate the quickfix list with the files that need to be modified. To do this, I can use the following command to find and add the files to the quickfix list:
+
+```vim
+:grep "@Column(.*\(COMPONENT_ID\|COMPONENT_IDS\|TIMESTAMP\|START_TIME\|ENTITY_ID\|TAG_KEY\|LATENCY\|START_TIME_SECOND\|START_TIME_NANOS\|VALUE\|TIME_BUCKET\|PERCENTAGE\|OPERATION_TIME\|CREATE_TIME\|OPERATION_TIME\|DUMP_TIME\|SEQUENCE\|TRACE_ID\|TIMESTAMP_MILLIS\)" **/src/**/*.java
+```
+
+After the quickfix list is populated, I can use the following command to get a glimpse of how many files that need to be modified:
+
+```vim
+:echo len(getqflist())
+```
+
+It shows there are 83 fields that need to be modified. You can also use the following command to open the quickfix window to see the list of files:
+
+```vim
+:copen
+```
+
+## Add the annotation to the fields
+
+Now that I have the list of files that need to be modified, I can use the `:norm` command to perform some operations in command mode, i.e. add the annotation above the fields. Here is the command that I used:
+
+```vim
+:cdo norm! O@ElasticSearch.EnableDocValues | update
+```
+
+- The `:cdo` command is used to execute a command in each file location in the quickfix list.
+- The `norm!` command is used to execute a normal mode command. In this case, I used `O` to firstly add a new line above the current line and then add the annotation `@ElasticSearch.EnableDocValues`.
+- The `| update` command is used to save the changes to the file.
+
+OK, now that every field needed to be modified has been added with the annotation, here comes the hardest part, before I added the `@ElasticSearch.EnableDocValues` annotation, the original file might or might not have the correct `import` statement for the annotation class, so after I added the annotation, there might be many compilation errors. So I need to add the missing `import` statements to the files, but I don't want to add a duplicate import statement if it already exists in the file.
+
+## Add the missing import statements
+
+In order to add the missing `import` statements, I can use the Code Actions feature in NeoVim's LSP, let's see how to import the annotation class `@ElasticSearch.EnableDocValues` in a single file first:
+
+1. Move the cursor to the begginning of the file by pressing `gg`
+2. Go the the next error diagnostic by pressing `]e`
+3. Press `<leader>ca` to show the available code actions
+
+I can see in the popup there is an option `Import 'ElasticSearch' (org.apache.skywalking.oap.server.core.storage.annotation.ElasticSearch)` along with other code actions, I can press `<Enter>` directly to apply the first code action.
+
+Now, how to perform the import code actions to all locations in the quickfix list? Here is how I did it:
+
+1. First, I need to move the cursor to the beginning of each file by pressing `gg`:
+
+```vim
+:cfdo norm gg
+```
+
+2. Now I can move the cursor to the next error diagnostic, and apply the "import" code action by searching the `Import` keyword in the popup and press `<Enter>`, I can do this by running multiple Lua scripts in the command line:
+
+```vim
+:cfdo lua vim.diagnostic.goto_next({ severity = "error" }); vim.lsp.buf.code_action({filter = function(ca) return ca.title:find('Import', 1, true) == 1 end, apply = true})
+```
+
+Let's break down the command:
+
+- `:cfdo` is used to execute the command in each file in the quickfix list, I use `cfdo` in this case instead of `cdo` because I only need to perform the import action in each file only once, even if there are multiple `@ElasticSearch.EnableDocValues` annotations in that file, thus avoiding duplicated `import` statements.
+- `lua` is used to execute a Lua script.
+- `vim.diagnostic.goto_next({ severity = "error" })` is used to move the cursor to the next error diagnostic.
+- `vim.lsp.buf.code_action` is used to show the code actions popup, but I don't want the results to be a popup, I want to filter the single code action I want and directly apply it.
+  - `filter = function(ca) return ca.title:find('Import', 1, true) == 1 end` is used to filter the code actions whose title starts with `Import`, which is what I want.
+  - `apply = true` is used to apply the first matching code action directly, and thus no popup and interactive selection is needed.
+
+After running the command, I can see there might be some info messages:
+
+```
+No more valid diagnostics to move to
+```
+
+which is because some files might already have the correct `imports` because other fields in the same file might be already using the annotation `@ElasticSearch.<other-annotation>`. But anyhow I can see the missing import statements are added to the files, and the compilation errors are gone.

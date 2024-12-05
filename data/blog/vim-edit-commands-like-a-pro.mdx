@@ -1,0 +1,53 @@
+---
+title: Edit in VIM command mode like a pro
+summary: |
+  Editing complex commands in VIM command mode can be a pain, especially when you need to jump around the command to fix a typo. In this post, I will show you different ways how to edit commands in VIM command mode like a pro.
+tags: [ vim, tools, tips ]
+date: 2024-12-05
+draft: false
+images: [ /static/images/vim-edit-commands-like-a-pro/banner.jpg ]
+---
+
+You want to run a command in VIM to replace all occurrences of `foo` with `bar` in the current buffer, but you made a typo in the command:
+
+```vim
+:%s/foor/bar/g
+```
+
+And you find nothing is replaced because of the typo `foor`. Now you press `:` and use the up arrow key to go back to the previous command, and you want to jump to the second `r` and delete it, now you have to press the left arrow key for six times and then press backspace to delete the `r`, that's a pain!
+
+You wish you could edit the command just like in normal mode, so that you can press `2Frx` to delete the second `r`, but you can't, because you are in command mode, not normal mode.
+
+This is what this post is about! I'll show you how to edit in command mode in an efficient way.
+
+# Command-line window
+
+There is a window called command-line window in VIM, when entering command mode by pressing `:`, you can open the command-line window with `<ctrl-f>`, and you will see a split window at the bottom of your window, showing the commands that you have executed, and the last line is the command you are currently typing.
+
+[![Command-line window](/static/images/vim-edit-commands-like-a-pro/command-line-window.jpg)](/static/images/vim-edit-commands-like-a-pro/command-line-window.jpg)
+
+When entering command-line window, you are in a regular buffer just like what you opened a file in VIM, you can use all the VIM commands to edit the command you are typing.
+
+After typing the command, you can just press `Enter`, and the command will be executed.
+
+You can even just navigate to a history command, and press `Enter` to re-run the command.
+
+# Paste register content in command mode
+
+Besides editing the command in the command-line window, sometimes you might want to compose a complex command by copying some texts from the buffer, for example, you have the following texts:
+
+```text
+This is a text with a very long word, intercommunication,
+that you want to replace with a shorter word, communication.
+And you have 345 lines below with the same words that you want to replace.
+```
+
+Now you want to replace `intercommunication` with `communication`, and you don't want to type the long word again and again in the command line, here is how you can do it:
+
+1. Select the word `intercommunication`, and yank it to register `a` with `"ay`;
+2. Select the word `communication`, and yank it to another register `b` with `"by`;
+3. Enter command mode by pressing `:`, and type `%s/<ctrl-r>a/<ctrl-r>b/g`, and press `Enter`;
+
+In the step 3, `<ctrl-r>` is used to paste the content of the register, `a` and `b` are the registers we yanked the words to, so you don't need to type the long words again.
+
+For more example usages of VIM registers, please refer to my last post [VIM registers explained, usages and examples](/blog/registers-in-vim).

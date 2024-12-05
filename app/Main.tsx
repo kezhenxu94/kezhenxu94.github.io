@@ -11,13 +11,24 @@ export default function Home({ posts }) {
   return (
     <>
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="space-y-2 pb-8 pt-6 md:space-y-5">
-          <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Latest
-          </h1>
-          <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            Latest blog posts and articles.
-          </p>
+        <div className="flex flex-col items-center gap-x-12 xl:flex-row">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
+              Latest
+            </h1>
+            <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
+              Latest blog posts, tips & tricks, tutorials and more!
+              <br />
+              Please subscribe to the newsletter to get the latest updates.
+            </p>
+          </div>
+          {siteMetadata.newsletter?.provider && (
+            <div className="mx-2 my-12 flex w-[288px] items-center justify-center sm:w-[400px] md:w-[550px]">
+              <div className="flex items-center justify-center">
+                <NewsletterForm title="Stay updated, receive the latest post straight to your mailbox" />
+              </div>
+            </div>
+          )}
         </div>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {!posts.length && 'No posts found.'}
@@ -96,11 +107,6 @@ export default function Home({ posts }) {
           >
             All Posts &rarr;
           </Link>
-        </div>
-      )}
-      {siteMetadata.newsletter?.provider && (
-        <div className="flex items-center justify-center pt-4">
-          <NewsletterForm />
         </div>
       )}
     </>

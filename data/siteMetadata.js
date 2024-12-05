@@ -3,7 +3,7 @@ const siteMetadata = {
   title: `kezhenxu94's blog`,
   author: 'kezhenxu94',
   headerTitle: 'kezhenxu94',
-  description: `kezhenxu94's personal blog posts, tips & tricks for tools, tutorials and more`,
+  description: `Blogging about dev, tips & tricks, tutorials and more`,
   language: 'en-us',
   theme: 'system',
   siteUrl: 'https://kezhenxu94.me',

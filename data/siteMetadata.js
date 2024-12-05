@@ -70,6 +70,7 @@ const siteMetadata = {
     //   indexName: 'docsearch',
     // },
   },
+  showDiscussOnTwitter: false,
 }
 
 module.exports = siteMetadata

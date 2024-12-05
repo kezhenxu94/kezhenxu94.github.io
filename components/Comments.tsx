@@ -5,7 +5,7 @@ import { useState } from 'react'
 import siteMetadata from '@/data/siteMetadata'
 
 export default function Comments({ slug }: { slug: string }) {
-  const [loadComments, setLoadComments] = useState(true)
+  const [loadComments, setLoadComments] = useState(process.env.NODE_ENV === 'production')
 
   if (!siteMetadata.comments?.provider) {
     return null

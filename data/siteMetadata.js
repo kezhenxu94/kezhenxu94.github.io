@@ -71,6 +71,7 @@ const siteMetadata = {
     // },
   },
   showDiscussOnTwitter: false,
+  showAuthorsInBlog: false,
 }
 
 module.exports = siteMetadata

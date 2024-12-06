@@ -128,7 +128,11 @@ export default function ListLayoutWithTags({
                   <li key={path} className="py-5 first:pt-0">
                     <article className="flex flex-row xl:space-x-5">
                       {images && (
-                        <div className="hidden flex-none xl:flex">
+                        <Link
+                          href={`/${path}`}
+                          aria-label={`Read "${title}"`}
+                          className="hidden flex-none xl:flex"
+                        >
                           <Image
                             src={images[0]}
                             alt={title}
@@ -137,7 +141,7 @@ export default function ListLayoutWithTags({
                             className="thumbnail-image"
                             quality={50}
                           />
-                        </div>
+                        </Link>
                       )}
                       <div className="flex-grow">
                         <dl>

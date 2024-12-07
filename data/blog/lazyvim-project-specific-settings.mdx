@@ -1,0 +1,90 @@
+---
+title: Project specific configurations in LazyVim with .lazy.lua
+summary: |
+  Developers usually organize their configuration files in a dotfiles repository, while in some cases when you work on specific projects, you have special settings for these projects but you don't want to mess up your dotfiles, in this post I'll show you how to set per-project local configurations without changing your dotfiles.
+tags: [ neovim, lazyvim, tools, tips ]
+date: 2024-12-07
+draft: false
+images: [ /static/images/lazyvim-project-specific-settings/banner.jpg ]
+---
+
+I organize all my configuration files in [my dotfiles repository](https://github.com/kezhenxu94/dotfiles), which includes my NeoVim settings, but there are cases where I need to tweak the settings project by project, and I don't want to mess up my dotfiles with so many `if` statements to check the project name.
+
+Here are some example cases where I want to have project-specific settings:
+
+- Disable auto formatting or set a different formatter/linter for a project which uses a different code style than my default settings;
+- Set database connection settings for neovim database plugin for a specific project;
+- Set different `tabstop`, `shiftwidth`, etc., for a project which uses a different coding style, even set these settings for different file types.
+
+In LazyVim, there is a less-known feature called local configuration, which allows you to write project specific configurations in a `.lazy.lua` file in your project root directory, and these settings will be loaded when you open the project in NeoVim, I'll show you how to use this feature to solve the problems mentioned above.
+
+# Project specific configurations
+
+First, you'll need to create a `.lazy.lua` in your project's root directory, here is an example `.lazy.lua`:
+
+```lua:.lazy.lua
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.g.autoformat = false
+
+return {}
+```
+
+It's just like when you write a plugin configuration in your `~/.config/nvim/lua/plugins/` directory, you have to add a return statement at the end of the file, even if it's an empty table `{}`.
+
+Then if you close NeoVim and open it again in the project directory, you'll see a prompt asking if you trust the `.lazy.lua` file:
+
+```text
+~/my-project/.lazy.lua is not trusted.
+[i]gnore, (v)iew, (d)eny, (a)llow:
+```
+
+This is because it's a Lua script and it can execute arbitrary code, you can press `a` to allow it, and the settings in the `.lazy.lua` will be loaded.
+
+In the example code above, we set `tabstop` and `shiftwidth` to 4, and disable auto formatting, you can add more settings to this file according to your needs.
+
+# Project specific plugin configurations
+
+You can also set different configurations for a plugin, and the configurations will be merged into your global configurations in your `~/.config/nvim` directory, here is an example:
+
+```lua:.lazy.lua
+return {
+    {
+        "stevearc/conform.nvim",
+        opts = {
+            formatters_by_ft = {
+                java = { "google-java-format" },
+                vue = { " EsLintFixAll" },
+            },
+        },
+    },
+}
+```
+
+In the configuration, we replicate the plugin definition `stevearc/conform.nvim` and set different `formatters_by_ft` for `java` and `vue` file types, setting `google-java-format` as the Java file formatter and `EsLintFixAll` as the Vue file linter, these settings will be recursively copied into the global plugin configuration, so you don't need to worry about missing some of your global configurations.
+
+# File type specific configurations
+
+You can even further have file type specific configurations in the `.lazy.lua` file for project-specific configuration, here is an example:
+
+```lua:.lazy.lua
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "json",
+    group = vim.api.nvim_create_augroup("json", { clear = true }),
+    callback = function(opts)
+        vim.opt.tabstop = 2
+        vim.opt.shiftwidth = 2
+        vim.g.autoformat = true
+    end,
+})
+
+return {}
+```
+
+In this example, we create a `autocmd` for `json` file type, and set `tabstop` and `shiftwidth` to 2 and enable auto formatting for the JSON files, this is extremely useful when you work on a project which uses a compact indentation style for JSON files, which is 2 spaces in this case.
+
+# Conclusion
+
+You can use the `.lazy.lua` file to set project-specific configurations without changing your dotfiles, this is very useful when you work on multiple projects with different settings, and you don't want to mess up your global configurations, I hope this post helps you to organize your project-specific settings in LazyVim.
+
+Have more use cases? Share them in the comments below 👇!

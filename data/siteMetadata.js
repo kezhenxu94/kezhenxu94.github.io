@@ -10,7 +10,7 @@ const siteMetadata = {
   siteRepo: 'https://github.com/kezhenxu94/kezhenxu94.github.io',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/avatar.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
-  email: 'kezhenxu94@apache.org',
+  email: 'i@kezhenxu94.me',
   github: 'https://github.com/kezhenxu94',
   x: 'https://twitter.com/kezhenxu94',
   linkedin: 'https://linkedin.com/in/kezhenxu94',

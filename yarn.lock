@@ -2113,6 +2113,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/js@npm:^9.16.0":
+  version: 9.17.0
+  resolution: "@eslint/js@npm:9.17.0"
+  checksum: 10/1a89e62f5c50e75d44565b7f3b91701455a999132c991e10bac59c118fbb54bdd54be22b9bda1ac730f78a2e64604403d65ce5dd7726d80b2632982cfc3d84ac
+  languageName: node
+  linkType: hard
+
 "@eslint/object-schema@npm:^2.1.4":
   version: 2.1.4
   resolution: "@eslint/object-schema@npm:2.1.4"
@@ -6373,6 +6380,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"globals@npm:^15.12.0":
+  version: 15.13.0
+  resolution: "globals@npm:15.13.0"
+  checksum: 10/ba84d0612d516bcc1dabdd9ce66667956e1a87401fb53be6c379f8f6a04f8e6ce415b584801ae2689a90e788e89bb38adfafc854a8a50ae8e322bb4dd35a2105
+  languageName: node
+  linkType: hard
+
 "globalthis@npm:^1.0.4":
   version: 1.0.4
   resolution: "globalthis@npm:1.0.4"
@@ -7578,6 +7592,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "kezhenxu94@workspace:."
   dependencies:
+    "@eslint/eslintrc": "npm:^3.2.0"
+    "@eslint/js": "npm:^9.16.0"
     "@headlessui/react": "npm:2.2.0"
     "@next/bundle-analyzer": "npm:15.0.2"
     "@svgr/webpack": "npm:^8.0.1"
@@ -7597,6 +7613,7 @@ __metadata:
     eslint-config-prettier: "npm:^9.1.0"
     eslint-plugin-prettier: "npm:^5.2.0"
     github-slugger: "npm:^2.0.0"
+    globals: "npm:^15.12.0"
     gray-matter: "npm:^4.0.2"
     hast-util-from-html-isomorphic: "npm:^2.0.0"
     husky: "npm:^9.0.0"

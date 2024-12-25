@@ -34,6 +34,7 @@ export default function Projects() {
                 </p>
                 {tool.href && (
                   <a
+                    target="_blank"
                     href={tool.href}
                     className="text-base font-medium leading-6 text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
                     aria-label={`Link to ${tool.title}`}

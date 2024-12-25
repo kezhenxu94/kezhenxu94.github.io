@@ -7,6 +7,11 @@ interface Tool {
 
 const toolsData: Tool[] = [
   {
+    title: 'Video Studio',
+    description: `A video editing tool, 100% free, completely running in the browser.`,
+    href: 'https://video-studio.kezhenxu94.me',
+  },
+  {
     title: 'Image to text',
     description: `Generate description and recognize text in images using AI models`,
     href: 'https://img2txt.kezhenxu94.me',
@@ -25,7 +30,7 @@ const toolsData: Tool[] = [
     title: '中文简体繁体转换',
     description: `直接在你的浏览器中进行中文简繁体转换, 无需连接服务器, 完全在本地浏览器运行.`,
     href: 'https://cc.kezhenxu94.me',
-  }
+  },
 ]
 
 export default toolsData

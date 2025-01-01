@@ -12,6 +12,11 @@ const toolsData: Tool[] = [
     href: 'https://video-studio.kezhenxu94.me',
   },
   {
+    title: 'AI ChatBot',
+    description: `A chatbot that can chat with you, powered by AI models.`,
+    href: 'https://chat.kezhenxu94.me',
+  },
+  {
     title: 'Image to text',
     description: `Generate description and recognize text in images using AI models`,
     href: 'https://img2txt.kezhenxu94.me',
